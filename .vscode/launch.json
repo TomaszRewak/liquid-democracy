@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "backend",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/backend/target/debug/liquid_democracy.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "console": "integratedTerminal" // integratedTerminal
+        },
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cargo",
+            "command": "build",
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/backend"
+            },
+            "group": "build",
+            "label": "build-all",
+            "presentation": {
+                "clear": true
+            }
+        }
+    ]
+}
