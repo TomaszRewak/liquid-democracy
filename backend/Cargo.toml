@@ -1,0 +1,4 @@
+[package]
+name = "liquid_democracy"
+version = "0.1.0"
+authors = ["Tomasz Rewak <tomasz.rewak@gmail.com>"]
