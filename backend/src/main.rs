@@ -1,7 +1,16 @@
-use axum::{handler::get, Router};
 use uuid::Uuid;
 
-struct Vote {
+struct User {
+    id: Uuid,
+    name: String,
+}
+
+struct Poll {
+    id: Uuid,
+    name: String,
+}
+
+struct Party {
     id: Uuid,
     name: String,
 }

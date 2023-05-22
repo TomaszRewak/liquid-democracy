@@ -2,6 +2,7 @@
 name = "liquid_democracy"
 version = "0.1.0"
 authors = ["Tomasz Rewak <tomasz.rewak@gmail.com>"]
+edition = "2021"
 
 [dependencies]
 axum = "0.6.18"
