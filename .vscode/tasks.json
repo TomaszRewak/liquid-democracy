@@ -3,7 +3,9 @@
     "tasks": [
         {
             "command": "cargo",
-            "args": ["build"],
+            "args": [
+                "build"
+            ],
             "options": {
                 "cwd": "${workspaceRoot}/backend"
             },
