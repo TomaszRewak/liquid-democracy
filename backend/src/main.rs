@@ -1,7 +1,11 @@
-use axum::{routing::post, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 struct User {
@@ -19,7 +23,7 @@ struct Party {
     name: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
 enum VoteType {
     Yea,
     Nay,
@@ -32,11 +36,13 @@ struct Vote {
     vote_type: VoteType,
 }
 
+#[derive(Debug, Deserialize, Serialize, /* todo: remove */ Clone)]
 struct Block {
     prev: Option<Box<Block>>,
     vote_type: VoteType,
 }
 
+#[derive(Debug, Deserialize, Serialize, /* todo: remove */ Clone)]
 struct BlockChain {
     head: Option<Block>,
 }
@@ -55,24 +61,39 @@ impl BlockChain {
     }
 }
 
+#[derive(Clone)]
 struct AppState {
-    block_chain: BlockChain,
+    block_chain: Arc<Mutex<BlockChain>>,
 }
 
-async fn vote_handler(vote: axum::extract::Json<Vote>, app_state: axum::extract::State<Arc<AppState>>) -> axum::response::Json<Uuid> {
+async fn vote_handler(
+    axum::extract::State(app_state): axum::extract::State<AppState>,
+    vote: axum::extract::Json<Vote>,
+) -> axum::response::Json<Uuid> {
     let uuid = Uuid::new_v4();
-    let block_chain = & app_state.block_chain;
+    let mut block_chain = app_state.block_chain.lock().await;
+
+    block_chain.add_block(vote.vote_type);
 
     axum::response::Json(uuid)
 }
 
+async fn get_block_chain(
+    axum::extract::State(app_state): axum::extract::State<AppState>,
+) -> axum::response::Json<BlockChain> {
+    let block_chain = app_state.block_chain.lock().await;
+
+    axum::response::Json(block_chain.clone())
+}
+
 #[tokio::main]
 async fn main() {
-    let app_state = Arc::new(AppState {
-        block_chain: BlockChain::new(),
-    });
+    let app_state: AppState = AppState {
+        block_chain: Arc::new(Mutex::new(BlockChain::new())),
+    };
     let app = Router::new()
         .route("/vote", post(vote_handler))
+        .route("/chain", get(get_block_chain))
         .with_state(app_state);
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
