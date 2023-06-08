@@ -1,7 +1,12 @@
+mod common_data;
+mod network_data;
+
 use axum::{
     routing::{get, post},
     Router,
 };
+use common_data::VoteType;
+use network_data::VoteRequest;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -21,12 +26,6 @@ struct Poll {
 struct Party {
     id: Uuid,
     name: String,
-}
-
-#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
-enum VoteType {
-    Yea,
-    Nay,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -68,7 +67,7 @@ struct AppState {
 
 async fn vote_handler(
     axum::extract::State(app_state): axum::extract::State<AppState>,
-    vote: axum::extract::Json<Vote>,
+    vote: axum::extract::Json<VoteRequest>,
 ) -> axum::response::Json<Uuid> {
     let uuid = Uuid::new_v4();
     let mut block_chain = app_state.block_chain.lock().await;
