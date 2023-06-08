@@ -6,11 +6,8 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceRoot}/backend/target/debug/liquid_democracy.exe",
-            "args": [],
-            "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
-            "environment": [],
-            "console": "integratedTerminal" // integratedTerminal
+            "console": "integratedTerminal"
         },
     ]
 }
