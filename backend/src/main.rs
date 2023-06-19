@@ -12,6 +12,8 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use uuid::Uuid;
+use tower_http::cors::CorsLayer;
+use axum::http::{Method};
 
 struct User {
     id: Uuid,
@@ -90,11 +92,18 @@ async fn main() {
     let app_state: AppState = AppState {
         block_chain: Arc::new(Mutex::new(BlockChain::new())),
     };
+
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(["http://localhost:3000".parse().unwrap()])
+        .allow_headers([axum::http::header::CONTENT_TYPE]);
+
     let app = Router::new()
         .route("/vote", post(vote_handler))
         .route("/chain", get(get_block_chain))
+        .layer(cors)
         .with_state(app_state);
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
 
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
