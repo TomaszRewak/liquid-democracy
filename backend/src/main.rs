@@ -2,6 +2,7 @@ mod common_data;
 mod network_data;
 mod vote_store;
 
+use axum::http::Method;
 use axum::{
     routing::{get, post},
     Router,
@@ -9,12 +10,12 @@ use axum::{
 use common_data::VoteType;
 use network_data::VoteRequest;
 use serde::{Deserialize, Serialize};
-use std::net::SocketAddr;
 use std::sync::Arc;
+use std::{collections::HashMap, net::SocketAddr, path::PathBuf};
 use tokio::sync::Mutex;
-use uuid::Uuid;
 use tower_http::cors::CorsLayer;
-use axum::http::{Method};
+use uuid::Uuid;
+use vote_store::VoteStore;
 
 struct User {
     id: Uuid,
@@ -22,8 +23,7 @@ struct User {
 }
 
 struct Poll {
-    id: Uuid,
-    name: String,
+    pub vote_store: VoteStore,
 }
 
 struct Party {
@@ -65,6 +65,7 @@ impl BlockChain {
 
 #[derive(Clone)]
 struct AppState {
+    polls: Arc<Mutex<HashMap<Uuid, Poll>>>,
     block_chain: Arc<Mutex<BlockChain>>,
 }
 
@@ -73,6 +74,28 @@ async fn vote_handler(
     vote: axum::extract::Json<VoteRequest>,
 ) -> axum::response::Json<Uuid> {
     let uuid = Uuid::new_v4();
+
+    let mut polls = app_state.polls.lock().await;
+    let poll = polls.entry(vote.vote_id).or_insert_with(|| Poll {
+        vote_store: VoteStore::new(PathBuf::from(format!(
+            "C:\\Users\\Tomasz\\Programy\\Temp\\{}.csv",
+            vote.vote_id
+        ))),
+    });
+
+    let last_vote = poll.vote_store.get_last_vote();
+    let block_hash = match last_vote {
+        Some(last_vote) => last_vote.block_hash,
+        None => String::from("1"),
+    };
+
+    poll.vote_store
+        .add_vote(vote_store::Vote {
+            user_id: uuid,
+            vote_type: vote.vote_type,
+            block_hash,
+        });
+
     let mut block_chain = app_state.block_chain.lock().await;
 
     block_chain.add_block(vote.vote_type);
@@ -91,6 +114,7 @@ async fn get_block_chain(
 #[tokio::main]
 async fn main() {
     let app_state: AppState = AppState {
+        polls: Arc::new(Mutex::new(HashMap::new())),
         block_chain: Arc::new(Mutex::new(BlockChain::new())),
     };
 
