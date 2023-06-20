@@ -1,5 +1,6 @@
 mod common_data;
 mod network_data;
+mod vote_store;
 
 use axum::{
     routing::{get, post},
