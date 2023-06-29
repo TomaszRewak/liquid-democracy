@@ -7,3 +7,12 @@ VALUES
   ('Charlie', 'password3', 'salt3'),
   ('Dave', 'password4', 'salt4'),
   ('Eve', 'password5', 'salt5');
+
+INSERT INTO
+  polls (name, description)
+VALUES
+  ('Poll 1', 'Description 1'),
+  ('Poll 2', 'Description 2'),
+  ('Poll 3', 'Description 3'),
+  ('Poll 4', 'Description 4'),
+  ('Poll 5', 'Description 5');
