@@ -18,7 +18,7 @@ sudo service postgresql start
 
 ```bash
 cd frontend/
-npm run build
+npm start
 ```
 
 ### Run backend

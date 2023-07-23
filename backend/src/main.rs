@@ -18,10 +18,27 @@ use tokio::sync::Mutex;
 use tokio_postgres::types::{ToSql, Type};
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
+use bytes::BytesMut;
 
 #[derive(Clone)]
 struct AppState {
     postgres_connection_pool: Arc<Mutex<Pool<PostgresConnectionManager<tokio_postgres::NoTls>>>>,
+}
+
+impl ToSql for common_data::VoteType {
+    fn to_sql(&self, _: &Type, out: &mut BytesMut) -> Result<tokio_postgres::types::IsNull, Box<dyn std::error::Error + Sync + Send>> {
+        match self {
+            common_data::VoteType::Yea => out.extend_from_slice(b"yea"),
+            common_data::VoteType::Nay => out.extend_from_slice(b"nay"),
+        }
+        Ok(tokio_postgres::types::IsNull::No)
+    }
+
+    fn accepts(_: &Type) -> bool {
+        true // TODO check if type is equal to VoteType
+    }
+
+    tokio_postgres::types::to_sql_checked!();
 }
 
 async fn vote_handler(
@@ -33,10 +50,7 @@ async fn vote_handler(
 
     let user_id: i32 = 1;
     let poll_id: i32 = 1;
-    let vote_type = match vote.vote_type {
-        common_data::VoteType::Yea => "yea",
-        common_data::VoteType::Nay => "nay",
-    };
+    let vote_type = vote.vote_type;
 
     connection
         .execute(
@@ -61,7 +75,7 @@ async fn vote_handler(
 #[tokio::main]
 async fn main() {
     let postgres_manager = PostgresConnectionManager::new_from_stringlike(
-        "host=127.0.0.1 user=postgres dbname=liquid_democracy",
+        "host=127.0.0.1 user=postgres password=postgres dbname=liquid_democracy",
         tokio_postgres::NoTls,
     )
     .unwrap();
