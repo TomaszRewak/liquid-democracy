@@ -3,9 +3,9 @@
     "configurations": [
         {
             "name": "backend",
-            "type": "cppvsdbg",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/backend/target/debug/liquid_democracy.exe",
+            "program": "${workspaceRoot}/backend/target/debug/liquid_democracy",
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal"
         },
