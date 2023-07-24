@@ -1,13 +1,22 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from '../../effects/useApiUrl';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 export default function Poll() {
     const [voteType, setVoteType] = useState('Nay');
+    const [pollResults, setPollResults] = useState(undefined);
     const voteUrl = useApiUrl('vote');
     const { pollId } = useParams();
+    const pollResultsUrl = useApiUrl(`polls/${pollId}/results`);
 
     console.dir(typeof pollId)
+
+    const refreshPollResults = useCallback(async () => {
+        const response = await fetch(pollResultsUrl);
+        const data = await response.json();
+
+        setPollResults(data);
+    }, [pollResultsUrl]);
 
     const handleClick = useCallback(async () => {
         const response = await fetch(voteUrl, {
@@ -24,10 +33,17 @@ export default function Poll() {
         })
 
         console.log(response);
-    }, [voteType, voteUrl, pollId]);
+
+        await refreshPollResults();
+    }, [voteType, voteUrl, pollId, refreshPollResults]);
+
+    useEffect(() => {
+        refreshPollResults();
+    }, [refreshPollResults]);
 
     return (
         <div>
+            <Link to='/'>Home</Link>
             <h1>Poll</h1>
             <h2>{pollId}</h2>
             <select value={voteType} onChange={e => setVoteType(e.target.value)}>
@@ -37,6 +53,12 @@ export default function Poll() {
             <button onClick={handleClick}>
                 Click me
             </button>
+            {pollResults && (
+                <div>
+                    <h3>{`Yes: ${pollResults.yes_votes}`}</h3>
+                    <h3>{`No: ${pollResults.no_votes}`}</h3>
+                </div>
+            )}
         </div>
     );
 }

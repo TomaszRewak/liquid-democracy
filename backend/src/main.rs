@@ -1,14 +1,14 @@
 mod common_data;
 mod network_data;
 
-use axum::extract::{Json as JsonRequest, State};
+use axum::extract::{Json as JsonRequest, Path, State};
 use axum::http::Method;
 use axum::response::Json as JsonResponse;
 use axum::{routing::get, routing::post, Router};
 use bb8_postgres::bb8::PooledConnection;
 use bb8_postgres::{bb8::Pool, PostgresConnectionManager};
 use bytes::BytesMut;
-use network_data::{GetPollsResponse, VoteRequest};
+use network_data::{GetPollResultsResponse, GetPollsResponse, VoteRequest};
 use std::net::SocketAddr;
 use std::time::SystemTime;
 use tokio_postgres::types::{ToSql, Type};
@@ -71,9 +71,7 @@ async fn post_vote(
     JsonResponse(uuid)
 }
 
-async fn get_polls(
-    State(app_state): State<AppState>,
-) -> JsonResponse<GetPollsResponse> {
+async fn get_polls(State(app_state): State<AppState>) -> JsonResponse<GetPollsResponse> {
     let connection = app_state.get_connection().await;
 
     let polls = connection
@@ -94,6 +92,42 @@ async fn get_polls(
         .collect();
 
     let response = GetPollsResponse { polls };
+
+    JsonResponse(response)
+}
+
+async fn get_poll_results(
+    State(app_state): State<AppState>,
+    Path(poll_id): Path<i32>,
+) -> JsonResponse<GetPollResultsResponse> {
+    let connection = app_state.get_connection().await;
+
+    let counts = connection
+        .query_one(
+            "
+                SELECT
+                    COUNT(*) FILTER (WHERE vote_type = 'yea') AS yes_votes,
+                    COUNT(*) FILTER (WHERE vote_type = 'nay') AS no_votes
+                FROM (
+                    SELECT DISTINCT ON (user_id)
+                        poll_id, user_id, vote_type
+                    FROM votes
+                    WHERE poll_id = $1
+                    ORDER BY user_id, created_at DESC
+                ) AS latest_votes
+            ",
+            &[&poll_id],
+        )
+        .await
+        .unwrap();
+
+    let yes_votes = counts.get("yes_votes");
+    let no_votes = counts.get("no_votes");
+
+    let response = GetPollResultsResponse {
+        yes_votes,
+        no_votes,
+    };
 
     JsonResponse(response)
 }
@@ -119,6 +153,7 @@ async fn main() {
     let app = Router::new()
         .route("/vote", post(post_vote))
         .route("/polls", get(get_polls))
+        .route("/polls/:poll_id/results", get(get_poll_results))
         .layer(cors)
         .with_state(app_state);
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));

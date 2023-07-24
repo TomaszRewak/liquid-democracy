@@ -33,3 +33,9 @@ pub struct Poll {
 pub struct GetPollsResponse {
     pub polls: Vec<Poll>,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetPollResultsResponse {
+    pub yes_votes: i64,
+    pub no_votes: i64,
+}
