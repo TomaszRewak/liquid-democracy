@@ -2,31 +2,36 @@ mod common_data;
 mod network_data;
 
 use axum::http::Method;
-use axum::{
-    routing::{get, post},
-    Router,
-};
-use bb8_postgres::{
-    bb8::{Pool, PooledConnection},
-    PostgresConnectionManager,
-};
+use axum::{routing::post, Router};
+use bb8_postgres::bb8::PooledConnection;
+use bb8_postgres::{bb8::Pool, PostgresConnectionManager};
+use bytes::BytesMut;
 use network_data::VoteRequest;
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use std::{collections::HashMap, net::SocketAddr, path::PathBuf};
-use tokio::sync::Mutex;
+use std::net::SocketAddr;
 use tokio_postgres::types::{ToSql, Type};
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
-use bytes::BytesMut;
+
+type ConnectionPool = Pool<PostgresConnectionManager<tokio_postgres::NoTls>>;
+type Connection<'a> = PooledConnection<'a, PostgresConnectionManager<tokio_postgres::NoTls>>;
 
 #[derive(Clone)]
 struct AppState {
-    postgres_connection_pool: Arc<Mutex<Pool<PostgresConnectionManager<tokio_postgres::NoTls>>>>,
+    postgres_connection_pool: ConnectionPool,
+}
+
+impl AppState {
+    async fn get_connection(&self) -> Connection {
+        self.postgres_connection_pool.get().await.unwrap()
+    }
 }
 
 impl ToSql for common_data::VoteType {
-    fn to_sql(&self, _: &Type, out: &mut BytesMut) -> Result<tokio_postgres::types::IsNull, Box<dyn std::error::Error + Sync + Send>> {
+    fn to_sql(
+        &self,
+        _: &Type,
+        out: &mut BytesMut,
+    ) -> Result<tokio_postgres::types::IsNull, Box<dyn std::error::Error + Sync + Send>> {
         match self {
             common_data::VoteType::Yea => out.extend_from_slice(b"yea"),
             common_data::VoteType::Nay => out.extend_from_slice(b"nay"),
@@ -45,8 +50,7 @@ async fn vote_handler(
     axum::extract::State(app_state): axum::extract::State<AppState>,
     vote: axum::extract::Json<VoteRequest>,
 ) -> axum::response::Json<Uuid> {
-    let connection_pool = app_state.postgres_connection_pool.lock().await;
-    let connection = connection_pool.get().await.unwrap();
+    let connection = app_state.get_connection().await;
 
     let user_id: i32 = 1;
     let poll_id: i32 = 1;
@@ -82,7 +86,7 @@ async fn main() {
     let postgres_connection_pool = Pool::builder().build(postgres_manager).await.unwrap();
 
     let app_state: AppState = AppState {
-        postgres_connection_pool: Arc::new(Mutex::new(postgres_connection_pool)),
+        postgres_connection_pool: postgres_connection_pool,
     };
 
     let cors = CorsLayer::new()
