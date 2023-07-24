@@ -6,13 +6,15 @@ const url = 'http://localhost:3001/'
 function App() {
   console.log('App.js');
 
+  const [polls, setPolls] = useState([]);
   const [voteType, setVoteType] = useState('Nay');
 
   useEffect(() => {
     const getPolls = async () => {
       const response = await fetch(`${url}polls`);
       const data = await response.json();
-      console.dir(data);
+
+      setPolls(data.polls);
     }
 
     getPolls();
@@ -37,6 +39,14 @@ function App() {
 
   return (
     <div className='App'>
+      <div>
+        {polls.map(poll => (
+          <div key={poll.id}>
+            <h3>{poll.name}</h3>
+            <p>{poll.description}</p>
+          </div>
+        ))}
+      </div>
       <select value={voteType} onChange={e => setVoteType(e.target.value)}>
         <option value='Yea'>Yes</option>
         <option value='Nay'>No</option>

@@ -18,14 +18,6 @@ pub struct VoteResponse {
     pub block_hash: String,
 }
 
-// CREATE TABLE polls (
-//     id SERIAL PRIMARY KEY,
-//     name VARCHAR(255) NOT NULL,
-//     description VARCHAR(255) NOT NULL,
-//     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-//     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-//   );
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Poll {
     pub id: i32,
