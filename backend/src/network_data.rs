@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use chrono::{DateTime, Utc};
+use chrono::serde::ts_seconds;
 
 use crate::common_data::VoteType;
 
@@ -14,4 +16,28 @@ pub struct VoteRequest {
 pub struct VoteResponse {
     pub request_id: Uuid,
     pub block_hash: String,
+}
+
+// CREATE TABLE polls (
+//     id SERIAL PRIMARY KEY,
+//     name VARCHAR(255) NOT NULL,
+//     description VARCHAR(255) NOT NULL,
+//     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+//     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+//   );
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Poll {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    #[serde(with = "ts_seconds")]
+    pub created_at: DateTime<Utc>,
+    #[serde(with = "ts_seconds")]
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetPollsResponse {
+    pub polls: Vec<Poll>,
 }

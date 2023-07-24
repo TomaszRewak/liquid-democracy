@@ -1,12 +1,25 @@
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const url = 'http://localhost:3001/'
 
 function App() {
+  console.log('App.js');
+
   const [voteType, setVoteType] = useState('Nay');
 
+  useEffect(() => {
+    const getPolls = async () => {
+      const response = await fetch(`${url}polls`);
+      const data = await response.json();
+      console.dir(data);
+    }
+
+    getPolls();
+  }, []);
 
   const handleClick = async () => {
-    const response = await fetch('http://localhost:3001/vote', {
+    const response = await fetch(`${url}vote`, {
       method: 'POST',
       headers:
       {

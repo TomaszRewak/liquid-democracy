@@ -1,13 +1,16 @@
 mod common_data;
 mod network_data;
 
+use axum::extract::{Json as JsonRequest, State};
 use axum::http::Method;
-use axum::{routing::post, Router};
+use axum::response::Json as JsonResponse;
+use axum::{routing::get, routing::post, Router};
 use bb8_postgres::bb8::PooledConnection;
 use bb8_postgres::{bb8::Pool, PostgresConnectionManager};
 use bytes::BytesMut;
-use network_data::VoteRequest;
+use network_data::{GetPollsResponse, VoteRequest};
 use std::net::SocketAddr;
+use std::time::SystemTime;
 use tokio_postgres::types::{ToSql, Type};
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
@@ -46,15 +49,15 @@ impl ToSql for common_data::VoteType {
     tokio_postgres::types::to_sql_checked!();
 }
 
-async fn vote_handler(
-    axum::extract::State(app_state): axum::extract::State<AppState>,
-    vote: axum::extract::Json<VoteRequest>,
-) -> axum::response::Json<Uuid> {
+async fn post_vote(
+    State(app_state): State<AppState>,
+    request: JsonRequest<VoteRequest>,
+) -> JsonResponse<Uuid> {
     let connection = app_state.get_connection().await;
 
     let user_id: i32 = 1;
     let poll_id: i32 = 1;
-    let vote_type = vote.vote_type;
+    let vote_type = request.vote_type;
 
     connection
         .execute(
@@ -65,16 +68,35 @@ async fn vote_handler(
         .unwrap();
 
     let uuid = Uuid::new_v4();
-    axum::response::Json(uuid)
+    JsonResponse(uuid)
 }
 
-// async fn get_block_chain(
-//     axum::extract::State(app_state): axum::extract::State<AppState>,
-// ) -> axum::response::Json<BlockChain> {
-//     let block_chain = app_state.block_chain.lock().await;
+async fn get_polls(
+    State(app_state): State<AppState>,
+) -> JsonResponse<GetPollsResponse> {
+    let connection = app_state.get_connection().await;
 
-//     axum::response::Json(block_chain.clone())
-// }
+    let polls = connection
+        .query(
+            "SELECT id, name, description, created_at, updated_at FROM polls",
+            &[],
+        )
+        .await
+        .unwrap()
+        .iter()
+        .map(|row| network_data::Poll {
+            id: row.get(0),
+            name: row.get(1),
+            description: row.get(2),
+            created_at: SystemTime::into(row.get(3)),
+            updated_at: SystemTime::into(row.get(4)),
+        })
+        .collect();
+
+    let response = GetPollsResponse { polls };
+
+    JsonResponse(response)
+}
 
 #[tokio::main]
 async fn main() {
@@ -95,8 +117,8 @@ async fn main() {
         .allow_headers([axum::http::header::CONTENT_TYPE]);
 
     let app = Router::new()
-        .route("/vote", post(vote_handler))
-        //.route("/chain", get(get_block_chain))
+        .route("/vote", post(post_vote))
+        .route("/polls", get(get_polls))
         .layer(cors)
         .with_state(app_state);
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
