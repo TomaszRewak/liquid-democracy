@@ -56,7 +56,7 @@ async fn post_vote(
     let connection = app_state.get_connection().await;
 
     let user_id: i32 = 1;
-    let poll_id: i32 = 1;
+    let poll_id = request.poll_id;
     let vote_type = request.vote_type;
 
     connection
