@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import useApiUrl from '../../effects/useApiUrl';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
     const [polls, setPolls] = useState(undefined)
@@ -23,10 +24,10 @@ export default function Home() {
     return (
         <div>
             {polls.map(poll => (
-                <div key={poll.id}>
+                <Link to={`/poll/${poll.id}`} key={poll.id}>
                     <h3>{poll.name}</h3>
                     <p>{poll.description}</p>
-                </div>
+                </Link>
             ))}
         </div>
     );
