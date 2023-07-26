@@ -2,13 +2,16 @@ mod common_data;
 mod network_data;
 
 use axum::extract::{Json as JsonRequest, Path, State};
-use axum::http::Method;
+use axum::http::{Method, request, StatusCode};
 use axum::response::Json as JsonResponse;
+use axum::Extension;
 use axum::{routing::get, routing::post, Router};
 use bb8_postgres::bb8::PooledConnection;
 use bb8_postgres::{bb8::Pool, PostgresConnectionManager};
 use bytes::BytesMut;
+use cookie::Cookie;
 use network_data::{GetPollResultsResponse, GetPollsResponse, VoteRequest};
+use std::f32::consts::E;
 use std::net::SocketAddr;
 use std::time::SystemTime;
 use tokio_postgres::types::{ToSql, Type};
@@ -21,6 +24,11 @@ type Connection<'a> = PooledConnection<'a, PostgresConnectionManager<tokio_postg
 #[derive(Clone)]
 struct AppState {
     postgres_connection_pool: ConnectionPool,
+}
+
+#[derive(Clone)]
+struct AuthState {
+    user_id: Option<i32>,
 }
 
 impl AppState {
@@ -50,7 +58,7 @@ impl ToSql for common_data::VoteType {
 }
 
 async fn post_vote(
-    State(app_state): State<AppState>,
+    Extension(app_state): Extension<AppState>,
     request: JsonRequest<VoteRequest>,
 ) -> JsonResponse<Uuid> {
     let connection = app_state.get_connection().await;
@@ -71,7 +79,7 @@ async fn post_vote(
     JsonResponse(uuid)
 }
 
-async fn get_polls(State(app_state): State<AppState>) -> JsonResponse<GetPollsResponse> {
+async fn get_polls(Extension(app_state): Extension<AppState>) -> JsonResponse<GetPollsResponse> {
     let connection = app_state.get_connection().await;
 
     let polls = connection
@@ -97,7 +105,7 @@ async fn get_polls(State(app_state): State<AppState>) -> JsonResponse<GetPollsRe
 }
 
 async fn get_poll_results(
-    State(app_state): State<AppState>,
+    Extension(app_state): Extension<AppState>,
     Path(poll_id): Path<i32>,
 ) -> JsonResponse<GetPollResultsResponse> {
     let connection = app_state.get_connection().await;
@@ -132,6 +140,59 @@ async fn get_poll_results(
     JsonResponse(response)
 }
 
+async fn authenticate_user<B>(
+    request: &axum::http::Request<B>,
+) -> Option<i32> {
+    let session_token = request
+        .headers()
+        .get_all("Cookie")
+        .iter()
+        .find_map(|cookie| {
+            cookie
+                .to_str()
+                .ok()
+                .and_then(|cookie| cookie.parse::<cookie::Cookie>().ok())
+                .filter(|cookie| cookie.name() == "session_token")
+                .map(|cookie| cookie.value().to_owned().parse::<i32>().ok())
+                .flatten()
+        });
+
+    if session_token.is_none() {
+        return None;
+    }
+
+    let app_state = request.extensions().get::<Extension<AppState>>().unwrap();
+    let connection = app_state.get_connection().await;
+
+    let user_id = connection
+        .query_one(
+            "SELECT user_id FROM sessions WHERE token = $1",
+            &[&session_token],
+        )
+        .await
+        .unwrap()
+        .get(0);
+
+    Some(user_id)
+}
+
+async fn authentication_middleware<B>(
+    mut request: axum::http::Request<B>,
+    next: axum::middleware::Next<B>,
+) -> Result<axum::response::Response, StatusCode> {
+    let user_id = authenticate_user(&request).await;
+
+    if user_id.is_none() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    let auth_state = AuthState { user_id: user_id };
+
+    request.extensions_mut().insert(auth_state);
+
+    Ok(next.run(request).await)
+}
+
 #[tokio::main]
 async fn main() {
     let postgres_manager = PostgresConnectionManager::new_from_stringlike(
@@ -154,8 +215,10 @@ async fn main() {
         .route("/vote", post(post_vote))
         .route("/polls", get(get_polls))
         .route("/polls/:poll_id/results", get(get_poll_results))
+        .layer(axum::middleware::from_fn(authentication_middleware))
         .layer(cors)
-        .with_state(app_state);
+        .layer(Extension(app_state))
+        .layer(Extension(AuthState { user_id: None }));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
 
     axum::Server::bind(&addr)

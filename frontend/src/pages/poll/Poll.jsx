@@ -9,10 +9,14 @@ export default function Poll() {
     const { pollId } = useParams();
     const pollResultsUrl = useApiUrl(`polls/${pollId}/results`);
 
-    console.dir(typeof pollId)
-
     const refreshPollResults = useCallback(async () => {
         const response = await fetch(pollResultsUrl);
+
+        if (!response.ok) {
+            console.log('Error fetching poll results');
+            return;
+        }
+
         const data = await response.json();
 
         setPollResults(data);
