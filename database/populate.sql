@@ -2,8 +2,8 @@
 INSERT INTO
   users (name, password, password_salt)
 VALUES
-  ('Alice', 'password1', 'salt1'),
-  ('Bob', 'password2', 'salt2'),
+  ('Alice', 'dc90cf07de907ccc64636ceddb38e552a1a0d984743b1f36a447b73877012c39', 'salt1'),
+  ('Bob', 'dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf', 'salt2'),
   ('Charlie', 'password3', 'salt3'),
   ('Dave', 'password4', 'salt4'),
   ('Eve', 'password5', 'salt5');
