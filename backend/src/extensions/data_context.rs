@@ -2,9 +2,11 @@ use bb8_postgres::{
     bb8::{Pool, PooledConnection},
     PostgresConnectionManager,
 };
-use tokio_postgres::NoTls;
+use tokio_postgres::{types::ToSql, NoTls};
 
-type Connection<'a> = PooledConnection<'a, PostgresConnectionManager<tokio_postgres::NoTls>>;
+pub type Connection<'a> = PooledConnection<'a, PostgresConnectionManager<tokio_postgres::NoTls>>;
+pub type Params<'a> = &'a [&'a (dyn ToSql + Sync)];
+
 type ConnectionPool = Pool<PostgresConnectionManager<NoTls>>;
 type ConnectionManager = PostgresConnectionManager<NoTls>;
 

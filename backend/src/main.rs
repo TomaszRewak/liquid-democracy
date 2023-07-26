@@ -1,5 +1,6 @@
 mod common_data;
 mod extensions;
+mod middlewares;
 mod network_data;
 
 use axum::body::{Bytes, Full};
@@ -8,11 +9,10 @@ use axum::http::{Method, StatusCode};
 use axum::response::{Json as JsonResponse, Response};
 use axum::Extension;
 use axum::{routing::get, routing::post, Router};
-use bb8_postgres::bb8::PooledConnection;
-use bb8_postgres::PostgresConnectionManager;
 use bytes::BytesMut;
 use cookie::Cookie;
 use extensions::{auth_state::AuthState, data_context::DataContext};
+use middlewares::authentication_middleware;
 use network_data::{GetPollResultsResponse, GetPollsResponse, VoteRequest};
 use sha2::{Digest, Sha256};
 use std::net::SocketAddr;
@@ -207,68 +207,12 @@ async fn logout() -> Response<Full<Bytes>> {
         .unwrap()
 }
 
-async fn authenticate_user<B>(request: &axum::http::Request<B>) -> Option<AuthState> {
-    let session_token = request.headers().get("Cookie").and_then(|cookie| {
-        let cookie = match Cookie::parse(cookie.to_str().unwrap()) {
-            Ok(cookie) => cookie,
-            Err(_) => return None,
-        };
-        if cookie.name() == "session_token" {
-            Some(cookie.value().to_string())
-        } else {
-            None
-        }
-    });
-
-    if session_token.is_none() {
-        return None;
-    }
-
-    let data_context = request.extensions().get::<DataContext>().unwrap();
-    let connection: PooledConnection<'_, PostgresConnectionManager<tokio_postgres::NoTls>> =
-        data_context.get_connection().await;
-
-    let identity_query_result = connection
-        .query_one(
-            "SELECT u.id, u.name FROM users u JOIN sessions s ON u.id = s.user_id WHERE s.token = $1",
-            &[&session_token],
-        )
-        .await;
-
-    let row = match identity_query_result {
-        Ok(row) => row,
-        Err(_) => return None,
-    };
-
-    let user_id = row.get(0);
-    let user_name = row.get(1);
-
-    Some(AuthState {
-        id: user_id,
-        name: user_name,
-    })
-}
-
-async fn authentication_middleware<B>(
-    mut request: axum::http::Request<B>,
-    next: axum::middleware::Next<B>,
-) -> Result<axum::response::Response, StatusCode> {
-    let auth_state: Option<AuthState> = authenticate_user(&request).await;
-
-    if auth_state.is_none() {
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-
-    request.extensions_mut().insert(auth_state.unwrap());
-
-    Ok(next.run(request).await)
-}
-
 #[tokio::main]
 async fn main() {
     let data_context = DataContext::from_connection_string(
         "host=127.0.0.1 user=postgres password=postgres dbname=liquid_democracy",
-    ).await;
+    )
+    .await;
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])

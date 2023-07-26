@@ -1,0 +1,3 @@
+mod authentication_middleware;
+
+pub use authentication_middleware::authentication_middleware;
