@@ -1,9 +1,10 @@
 mod common_data;
 mod network_data;
 
+use axum::body::{BoxBody, Bytes, Full};
 use axum::extract::{Json as JsonRequest, Path, State};
-use axum::http::{Method, request, StatusCode};
-use axum::response::Json as JsonResponse;
+use axum::http::{request, Method, StatusCode};
+use axum::response::{Json as JsonResponse, Response};
 use axum::Extension;
 use axum::{routing::get, routing::post, Router};
 use bb8_postgres::bb8::PooledConnection;
@@ -11,12 +12,15 @@ use bb8_postgres::{bb8::Pool, PostgresConnectionManager};
 use bytes::BytesMut;
 use cookie::Cookie;
 use network_data::{GetPollResultsResponse, GetPollsResponse, VoteRequest};
+use serde::__private::de;
+use sha2::{Digest, Sha256};
 use std::f32::consts::E;
 use std::net::SocketAddr;
 use std::time::SystemTime;
 use tokio_postgres::types::{ToSql, Type};
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
+use time::OffsetDateTime;
 
 type ConnectionPool = Pool<PostgresConnectionManager<tokio_postgres::NoTls>>;
 type Connection<'a> = PooledConnection<'a, PostgresConnectionManager<tokio_postgres::NoTls>>;
@@ -27,8 +31,13 @@ struct AppState {
 }
 
 #[derive(Clone)]
+struct UserIdentification {
+}
+
+#[derive(Clone)]
 struct AuthState {
-    user_id: Option<i32>,
+    id: i32,
+    name: String,
 }
 
 impl AppState {
@@ -59,11 +68,12 @@ impl ToSql for common_data::VoteType {
 
 async fn post_vote(
     Extension(app_state): Extension<AppState>,
+    Extension(auth_state): Extension<AuthState>,
     request: JsonRequest<VoteRequest>,
 ) -> JsonResponse<Uuid> {
     let connection = app_state.get_connection().await;
 
-    let user_id: i32 = 1;
+    let user_id: i32 = auth_state.id;
     let poll_id = request.poll_id;
     let vote_type = request.vote_type;
 
@@ -140,55 +150,146 @@ async fn get_poll_results(
     JsonResponse(response)
 }
 
-async fn authenticate_user<B>(
-    request: &axum::http::Request<B>,
-) -> Option<i32> {
+async fn get_username(
+    Extension(auth_state): Extension<AuthState>,
+) -> JsonResponse<String> {
+    let username = auth_state.name.clone();
+
+    JsonResponse(username)
+}
+
+async fn login(
+    Extension(app_state): Extension<AppState>,
+    request: JsonRequest<network_data::LoginRequest>,
+) -> Response<Full<Bytes>> {
+    let connection = app_state.get_connection().await;
+
+    let username = &request.username;
+    let password = &request.password;
+
+    let query = connection
+        .query_one(
+            "SELECT id, password, password_salt FROM users WHERE name = $1",
+            &[&username],
+        )
+        .await;
+
+    let user = match query {
+        Ok(user) => user,
+        Err(_) => {
+            return Response::builder()
+                .status(StatusCode::UNAUTHORIZED)
+                .body(Full::from("Unauthorized"))
+                .unwrap();
+        }
+    };
+
+    let user_id: i32 = user.get(0);
+    let password_hash: String = user.get(1);
+    let password_salt: String = user.get(2);
+
+    let hasher = Sha256::new()
+        .chain_update(password_salt)
+        .chain_update(password)
+        .finalize();
+    let hashed_password: String = format!("{:x}", hasher);
+
+    if password_hash != hashed_password {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(Full::from("Unauthorized"))
+            .unwrap();
+    }
+
+    let session_token = Uuid::new_v4().to_string();
+
+    connection
+        .execute(
+            "INSERT INTO sessions (user_id, token) VALUES ($1, $2)",
+            &[&user_id, &session_token],
+        )
+        .await
+        .unwrap();
+
+    let cookie = Cookie::build("session_token", session_token)
+        .http_only(true)
+        .finish();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("Set-Cookie", cookie.to_string())
+        .body(Full::from("OK"))
+        .unwrap()
+}
+
+async fn logout() -> Response<Full<Bytes>> {
+    let cookie = Cookie::build("session_token", "")
+        .http_only(true)
+        .finish();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("Set-Cookie", cookie.to_string())
+        .body(Full::from("OK"))
+        .unwrap()
+}
+
+async fn authenticate_user<B>(request: &axum::http::Request<B>) -> Option<AuthState> {
     let session_token = request
         .headers()
-        .get_all("Cookie")
-        .iter()
-        .find_map(|cookie| {
-            cookie
-                .to_str()
-                .ok()
-                .and_then(|cookie| cookie.parse::<cookie::Cookie>().ok())
-                .filter(|cookie| cookie.name() == "session_token")
-                .map(|cookie| cookie.value().to_owned().parse::<i32>().ok())
-                .flatten()
+        .get("Cookie")
+        .and_then(|cookie| {
+
+            let cookie = match Cookie::parse(cookie.to_str().unwrap()) {
+                Ok(cookie) => cookie,
+                Err(_) => return None,
+            };
+            if cookie.name() == "session_token" {
+                Some(cookie.value().to_string())
+            } else {
+                None
+            }
         });
 
     if session_token.is_none() {
         return None;
     }
 
-    let app_state = request.extensions().get::<Extension<AppState>>().unwrap();
-    let connection = app_state.get_connection().await;
+    let app_state = request.extensions().get::<AppState>().unwrap();
+    let connection: PooledConnection<'_, PostgresConnectionManager<tokio_postgres::NoTls>> = app_state.get_connection().await;
 
-    let user_id = connection
+    let identity_query_result = connection
         .query_one(
-            "SELECT user_id FROM sessions WHERE token = $1",
+            "SELECT u.id, u.name FROM users u JOIN sessions s ON u.id = s.user_id WHERE s.token = $1",
             &[&session_token],
         )
-        .await
-        .unwrap()
-        .get(0);
+        .await;
 
-    Some(user_id)
+    let row = match identity_query_result {
+        Ok(row) => row,
+        Err(_) => return None,
+    };
+
+    let user_id = row.get(0);
+    let user_name = row.get(1);
+
+    Some(AuthState {
+        id: user_id,
+        name: user_name,
+    })
 }
 
 async fn authentication_middleware<B>(
     mut request: axum::http::Request<B>,
     next: axum::middleware::Next<B>,
 ) -> Result<axum::response::Response, StatusCode> {
-    let user_id = authenticate_user(&request).await;
+    let auth_state: Option<AuthState> = authenticate_user(&request).await;
 
-    if user_id.is_none() {
+    if auth_state.is_none() {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let auth_state = AuthState { user_id: user_id };
-
-    request.extensions_mut().insert(auth_state);
+    request.extensions_mut().insert(auth_state.unwrap());
 
     Ok(next.run(request).await)
 }
@@ -209,16 +310,19 @@ async fn main() {
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
         .allow_origin(["http://localhost:3000".parse().unwrap()])
-        .allow_headers([axum::http::header::CONTENT_TYPE]);
+        .allow_headers([axum::http::header::CONTENT_TYPE])
+        .allow_credentials(true);
 
     let app = Router::new()
         .route("/vote", post(post_vote))
         .route("/polls", get(get_polls))
         .route("/polls/:poll_id/results", get(get_poll_results))
+        .route("/username", get(get_username))
         .layer(axum::middleware::from_fn(authentication_middleware))
+        .route("/login", post(login))
+        .route("/logout", post(logout))
         .layer(cors)
-        .layer(Extension(app_state))
-        .layer(Extension(AuthState { user_id: None }));
+        .layer(Extension(app_state));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
 
     axum::Server::bind(&addr)

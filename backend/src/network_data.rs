@@ -1,9 +1,15 @@
+use chrono::serde::ts_seconds;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
-use chrono::serde::ts_seconds;
 
 use crate::common_data::VoteType;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VoteRequest {

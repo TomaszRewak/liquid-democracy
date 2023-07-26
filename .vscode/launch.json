@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "backend",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
             "program": "${workspaceRoot}/backend/target/debug/liquid_democracy",
             "cwd": "${workspaceRoot}",

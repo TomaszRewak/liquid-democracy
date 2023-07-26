@@ -10,7 +10,7 @@ export default function Poll() {
     const pollResultsUrl = useApiUrl(`polls/${pollId}/results`);
 
     const refreshPollResults = useCallback(async () => {
-        const response = await fetch(pollResultsUrl);
+        const response = await fetch(pollResultsUrl, { credentials: 'include'});
 
         if (!response.ok) {
             console.log('Error fetching poll results');
@@ -33,7 +33,8 @@ export default function Poll() {
                 poll_id: Number(pollId),
                 vote_type: voteType,
                 request_id: '550e8400-e29b-41d4-a716-446655440000'
-            })
+            }),
+            credentials: 'include'
         })
 
         console.log(response);
