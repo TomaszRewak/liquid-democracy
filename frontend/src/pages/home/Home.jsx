@@ -8,7 +8,7 @@ export default function Home() {
 
     useEffect(() => {
         const getPolls = async () => {
-            const response = await fetch(pollsUrl);
+            const response = await fetch(pollsUrl, { credentials: 'include' });
             const data = await response.json();
 
             setPolls(data.polls);
