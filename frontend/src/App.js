@@ -4,6 +4,7 @@ import Home from './pages/home/Home';
 import Poll from './pages/poll/Poll';
 import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from './effects/useApiUrl';
+import { Button, Input, Menu } from 'semantic-ui-react';
 
 function LoggedInView(props) {
   const { username } = props;
@@ -16,9 +17,9 @@ function LoggedInView(props) {
   }, [logoutUrl]);
 
   return (
-    <div>
-      <h1>Logged in as {username}</h1>
-      <button onClick={onLogout}>Logout</button>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <div>Logged in as {username}</div>
+      <Button size='tiny' onClick={onLogout}>Logout</Button>
     </div>
   );
 }
@@ -53,15 +54,9 @@ function LogInView() {
 
   return (
     <form onSubmit={onSubmit}>
-      <label>
-        Username:
-        <input type="text" name="username" onChange={onUsernameChange} />
-      </label>
-      <label>
-        Password:
-        <input type="password" name="password" onChange={onPasswordChange} />
-      </label>
-      <input type="submit" value="Submit" />
+      <Input size='mini' type="text" name="username" onChange={onUsernameChange} />
+      <Input size='mini' type="password" name="password" onChange={onPasswordChange} />
+      <Button size='mini' type="submit">Login</Button>
     </form>
   )
 }
@@ -91,6 +86,14 @@ function App() {
 
   return (
     <div>
+      <Menu fixed='top' borderless={true}>
+        <Menu.Item position='left'>
+          <a className='home-link' href='/'>liquid democracy</a>
+        </Menu.Item>
+        <Menu.Item position='right' className='authentication-menu-item'>
+          {authView}
+        </Menu.Item>
+      </Menu>
       <h1>App</h1>
       {authView}
       <Routes>

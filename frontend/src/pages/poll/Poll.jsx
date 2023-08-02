@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from '../../effects/useApiUrl';
 import { Link, useParams } from 'react-router-dom';
+import { Button } from 'semantic-ui-react'
 
 export default function Poll() {
     const [voteType, setVoteType] = useState('Nay');
@@ -10,7 +11,7 @@ export default function Poll() {
     const pollResultsUrl = useApiUrl(`polls/${pollId}/results`);
 
     const refreshPollResults = useCallback(async () => {
-        const response = await fetch(pollResultsUrl, { credentials: 'include'});
+        const response = await fetch(pollResultsUrl, { credentials: 'include' });
 
         if (!response.ok) {
             console.log('Error fetching poll results');
@@ -55,9 +56,14 @@ export default function Poll() {
                 <option value='Yea'>Yes</option>
                 <option value='Nay'>No</option>
             </select>
-            <button onClick={handleClick}>
-                Click me
-            </button>
+            <Button.Group>
+                <Button color='green' onClick={handleClick}>
+                    Yea
+                </Button>
+                <Button color='red'>
+                    Nay
+                </Button>
+            </Button.Group>
             {pollResults && (
                 <div>
                     <h3>{`Yes: ${pollResults.yes_votes}`}</h3>
