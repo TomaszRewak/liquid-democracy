@@ -26,14 +26,14 @@ export default function Chart({ results }) {
     // TODO: draw a pie chart
     return <svg width="200" height="200" viewBox="0 0 200 200">
         <g transform="translate(100,100)">
-            <path d={generateArcPath(70, 20, 0, 0.7)} fill="#4ac234" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(70, 20, 0.7, 0.9)} fill="#eb3434" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(70, 20, 0.9, 1)} fill="gray" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, 0, 0.7)} fill="#4ac234" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, 0.7, 0.9)} fill="#eb3434" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, 0.9, 1)} fill="gray" stroke="white" strokeWidth={4.5} />
 
-            <path d={generateArcPath(70, 100, 0, 0.3)} fill="red" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(70, 100, 0.3, 0.7)} fill="blue" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(70, 100, 0.7, 0.9)} fill="blue" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(70, 100, 0.9, 1)} fill="blue" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 100, 0, 0.3)} fill="red" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 100, 0.3, 0.7)} fill="blue" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 100, 0.7, 0.9)} fill="blue" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 100, 0.9, 1)} fill="blue" stroke="white" strokeWidth={4.5} />
         </g>
     </svg>
 }

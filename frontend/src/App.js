@@ -5,11 +5,12 @@ import Poll from './pages/poll/Poll';
 import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from './effects/useApiUrl';
 import { Button, Input, Menu, Icon, Dropdown, Container, Segment } from 'semantic-ui-react';
+import { ProfileProvider, useProfile, useLogin, useLogout } from './contexts/profileContext';
 
 function LoggedInView({ profile }) {
-  const logoutUrl = useApiUrl('logout');
   const partiesUrl = useApiUrl('parties');
   const profileUrl = useApiUrl('profile');
+  const logout = useLogout();
 
   const [parties, setParties] = useState([]);
 
@@ -27,12 +28,6 @@ function LoggedInView({ profile }) {
   useEffect(() => {
     refreshParties();
   }, [refreshParties]);
-
-  const onLogout = useCallback(async () => {
-    await fetch(logoutUrl, { method: 'POST', credentials: 'include' });
-
-    window.location.reload();
-  }, [logoutUrl]);
 
   const selectParty = useCallback(async (e, { value }) => {
     await fetch(profileUrl, {
@@ -71,10 +66,10 @@ function LoggedInView({ profile }) {
       </Dropdown>
       <Dropdown labeled button text={profile.username} icon='user' className='mini icon'>
         <Dropdown.Menu>
-          <Dropdown.Item onClick={onLogout} style={{ background: 'red' }}>Logout</Dropdown.Item>
+          <Dropdown.Item onClick={logout} style={{ background: 'red' }}>Logout</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
-      <Button size='mini' onClick={onLogout} color='orange'>Logout</Button>
+      <Button size='mini' onClick={logout} color='orange'>Logout</Button>
     </div>
   );
 }
@@ -82,22 +77,13 @@ function LoggedInView({ profile }) {
 function LogInView() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const loginUrl = useApiUrl('login');
+  const login = useLogin();
 
   const onSubmit = useCallback(async (event) => {
     event.preventDefault();
 
-    const response = await fetch(loginUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password }),
-      credentials: 'include'
-    });
-
-    window.location.reload();
-  }, [loginUrl, password, username]);
+    await login(username, password);
+  }, [login, password, username]);
 
   const onUsernameChange = useCallback((event) => {
     setUsername(event.target.value);
@@ -116,54 +102,42 @@ function LogInView() {
   )
 }
 
-function App() {
-  const [profile, setProfile] = useState(undefined);
-  const profileUrl = useApiUrl('profile');
+function AuthView() {
+  const profile = useProfile();
 
-  const refreshProfile = useCallback(async () => {
-    const response = await fetch(profileUrl, { credentials: 'include' });
-
-    if (response.ok) {
-      setProfile(await response.json());
-    }
-    else {
-      setProfile(undefined);
-    }
-  }, [profileUrl]);
-
-  useEffect(() => {
-    refreshProfile();
-  }, [refreshProfile]);
-
-  const authView = profile
+  return profile
     ? <LoggedInView profile={profile} />
     : <LogInView />;
+}
 
+function App() {
   return (
-    <div>
-      <Menu className='top-menu' fixed='top' borderless={true}>
-        <Menu.Item position='left'>
-          <div>
-            <Button icon size='mini' className='mini' labelPosition='left' href='/'>
-              <Icon name='chart pie' />
-              liquid democracy
-            </Button>
-          </div>
-        </Menu.Item>
-        <Menu.Item position='right'>
-          {authView}
-        </Menu.Item>
-      </Menu>
-      <Container className='main'>
-        <Segment>
-          <Input></Input>
-        </Segment>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/poll/:pollId' element={<Poll />} />
-        </Routes>
-      </Container>
-    </div>
+    <ProfileProvider>
+      <div>
+        <Menu className='top-menu' fixed='top' borderless={true}>
+          <Menu.Item position='left'>
+            <div>
+              <Button icon size='mini' className='mini' labelPosition='left' href='/'>
+                <Icon name='chart pie' />
+                liquid democracy
+              </Button>
+            </div>
+          </Menu.Item>
+          <Menu.Item position='right'>
+            <AuthView />
+          </Menu.Item>
+        </Menu>
+        <Container className='main'>
+          <Segment>
+            <Input></Input>
+          </Segment>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/poll/:pollId' element={<Poll />} />
+          </Routes>
+        </Container>
+      </div>
+    </ProfileProvider>
   );
 }
 
