@@ -37,12 +37,25 @@ export function ProfileProvider({ children }) {
         await updateProfile();
     }, [logoutUrl, updateProfile]);
 
+    const setParty = React.useCallback(async (partyId) => {
+        await fetch(profileUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ party_id: partyId }),
+            credentials: 'include'
+        });
+
+        await updateProfile();
+    }, [profileUrl, updateProfile]);
+
     React.useEffect(() => {
         updateProfile();
     }, [updateProfile]);
 
     return (
-        <ProfileContext.Provider value={{ profile, login, logout }}>
+        <ProfileContext.Provider value={{ profile, login, logout, setParty }}>
             {children}
         </ProfileContext.Provider>
     );
@@ -58,4 +71,8 @@ export function useLogin() {
 
 export function useLogout() {
     return React.useContext(ProfileContext).logout;
+}
+
+export function useSetParty() {
+    return React.useContext(ProfileContext).setParty;
 }

@@ -5,12 +5,12 @@ import Poll from './pages/poll/Poll';
 import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from './effects/useApiUrl';
 import { Button, Input, Menu, Icon, Dropdown, Container, Segment } from 'semantic-ui-react';
-import { ProfileProvider, useProfile, useLogin, useLogout } from './contexts/profileContext';
+import { ProfileProvider, useProfile, useLogin, useLogout, useSetParty } from './contexts/profileContext';
 
 function LoggedInView({ profile }) {
   const partiesUrl = useApiUrl('parties');
-  const profileUrl = useApiUrl('profile');
   const logout = useLogout();
+  const setParty = useSetParty();
 
   const [parties, setParties] = useState([]);
 
@@ -30,17 +30,8 @@ function LoggedInView({ profile }) {
   }, [refreshParties]);
 
   const selectParty = useCallback(async (e, { value }) => {
-    await fetch(profileUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ party_id: value }),
-      credentials: 'include'
-    });
-
-    window.location.reload(); // TODO: refresh just the profile
-  }, [profileUrl]);
+    setParty(value);
+  }, [setParty]);
 
   const partyOptions = parties.map(party => ({
     key: party.id,
