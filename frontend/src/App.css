@@ -3,7 +3,15 @@
   color: #4a9e4a;
 }
 
-.authentication-menu-item {
+.top-menu >.item {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+}
+
+.top-menu >.item>form>.input {
+  margin-right: 5px;
+}
+
+.main.container {
+  padding-top: 70px;
 }

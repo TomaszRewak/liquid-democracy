@@ -1,13 +1,12 @@
-import { Route, Routes } from 'react-router-dom';
+import { Form, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Home from './pages/home/Home';
 import Poll from './pages/poll/Poll';
 import { useState, useCallback, useEffect } from 'react';
 import useApiUrl from './effects/useApiUrl';
-import { Button, Input, Menu } from 'semantic-ui-react';
+import { Button, Input, Menu, Icon, Dropdown, Divider, Container, Segment } from 'semantic-ui-react';
 
-function LoggedInView(props) {
-  const { username } = props;
+function LoggedInView({ username }) {
   const logoutUrl = useApiUrl('logout');
 
   const onLogout = useCallback(async () => {
@@ -17,9 +16,14 @@ function LoggedInView(props) {
   }, [logoutUrl]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-      <div>Logged in as {username}</div>
-      <Button size='tiny' onClick={onLogout}>Logout</Button>
+    <div>
+      <Button icon='eye' size='mini'/>
+      <Dropdown labeled button text={username} icon='user' className='mini icon'>
+        <Dropdown.Menu>
+          <Dropdown.Item onClick={onLogout}>Logout</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+      <Button size='mini' onClick={onLogout} color='orange'>Logout</Button>
     </div>
   );
 }
@@ -54,9 +58,9 @@ function LogInView() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Input size='mini' type="text" name="username" onChange={onUsernameChange} />
-      <Input size='mini' type="password" name="password" onChange={onPasswordChange} />
-      <Button size='mini' type="submit">Login</Button>
+      <Input size='mini' type="text" name="username" placeholder='username' onChange={onUsernameChange} />
+      <Input size='mini' type="password" name="password" placeholder='password' onChange={onPasswordChange} />
+      <Button size='mini' type="submit" primary>Login</Button>
     </form>
   )
 }
@@ -86,20 +90,28 @@ function App() {
 
   return (
     <div>
-      <Menu fixed='top' borderless={true}>
+      <Menu className='top-menu' fixed='top' borderless={true}>
         <Menu.Item position='left'>
-          <a className='home-link' href='/'>liquid democracy</a>
+          <div>
+            <Button icon size='mini' className='mini' labelPosition='left' href='/'>
+              <Icon name='chart pie' />
+              liquid democracy
+            </Button>
+          </div>
         </Menu.Item>
-        <Menu.Item position='right' className='authentication-menu-item'>
+        <Menu.Item position='right'>
           {authView}
         </Menu.Item>
       </Menu>
-      <h1>App</h1>
-      {authView}
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/poll/:pollId' element={<Poll />} />
-      </Routes>
+      <Container className='main'>
+        <Segment>
+          <Input></Input>
+        </Segment>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/poll/:pollId' element={<Poll />} />
+        </Routes>
+      </Container>
     </div>
   );
 }

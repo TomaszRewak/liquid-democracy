@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import useApiUrl from '../../effects/useApiUrl';
 import { Link } from 'react-router-dom';
+import { Card, Divider, Header, Icon, Segment } from 'semantic-ui-react';
+import Chart from '../../components/Chart';
 
 export default function Home() {
     const [polls, setPolls] = useState(undefined)
@@ -24,10 +26,18 @@ export default function Home() {
     return (
         <div>
             {polls.map(poll => (
-                <Link to={`/poll/${poll.id}`} key={poll.id}>
-                    <h3>{poll.name}</h3>
+                <Segment key={poll.id}>
+                    <Header as='h2'>
+                        {poll.name}
+                        <Link to={`/poll/${poll.id}`}>
+                            <Icon name='external alternate' />
+                            </Link>
+                    </Header>
+                    <Divider />
+                    <Chart/>
                     <p>{poll.description}</p>
-                </Link>
+
+                </Segment>
             ))}
         </div>
     );
