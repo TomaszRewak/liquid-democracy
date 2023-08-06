@@ -1,4 +1,6 @@
-DROP TABLE IF EXISTS party;
+DROP TABLE IF EXISTS party_affiliations;
+
+DROP TABLE IF EXISTS parties;
 
 DROP TABLE IF EXISTS votes;
 

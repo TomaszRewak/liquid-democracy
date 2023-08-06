@@ -38,9 +38,18 @@ CREATE TABLE votes (
   CONSTRAINT fk_poll_id FOREIGN KEY (poll_id) REFERENCES polls(id)
 );
 
-CREATE TABLE party (
+CREATE TABLE parties (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  color VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE party_affiliations (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  party_id INTEGER REFERENCES parties(id),
+  is_member BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

@@ -2,6 +2,7 @@ mod common_data;
 mod extensions;
 mod middlewares;
 mod routes;
+mod utils;
 
 use axum::http::Method;
 use axum::Extension;
@@ -28,8 +29,10 @@ async fn main() {
         .route("/vote", post(routes::vote::post))
         .route("/polls", get(routes::polls::get))
         .route("/polls/:poll_id/results", get(routes::poll_results::get))
-        .route("/username", get(routes::username::get))
+        .route("/profile", get(routes::profile::get))
+        .route("/profile", post(routes::profile::post))
         .layer(axum::middleware::from_fn(authentication_middleware))
+        .route("/parties", get(routes::parties::get))
         .route("/login", post(routes::login::post))
         .route("/logout", post(routes::logout::post))
         .layer(cors)

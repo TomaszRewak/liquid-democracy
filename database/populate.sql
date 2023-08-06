@@ -16,3 +16,12 @@ VALUES
   ('Poll 3', 'Description 3'),
   ('Poll 4', 'Description 4'),
   ('Poll 5', 'Description 5');
+
+INSERT INTO
+  parties (name, color)
+VALUES
+  ('Nice Party', 'red'),
+  ('Super Party', 'blue'),
+  ('Awesome Party', 'green'),
+  ('Cool Party', 'yellow'),
+  ('Great Party', 'purple');
