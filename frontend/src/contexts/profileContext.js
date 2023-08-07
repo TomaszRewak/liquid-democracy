@@ -1,15 +1,15 @@
-import React from "react";
+import { useState, createContext, useCallback, useEffect, useContext } from "react";
 import useApiUrl from '../effects/useApiUrl';
 
-export const ProfileContext = React.createContext();
+const ProfileContext = createContext();
 
 export function ProfileProvider({ children }) {
-    const [profile, setProfile] = React.useState(undefined);
+    const [profile, setProfile] = useState(undefined);
     const profileUrl = useApiUrl('profile');
     const loginUrl = useApiUrl('login');
     const logoutUrl = useApiUrl('logout');
 
-    const updateProfile = React.useCallback(async () => {
+    const updateProfile = useCallback(async () => {
         const response = await fetch(profileUrl, { credentials: 'include' });
         const profile = response.ok
             ? await response.json()
@@ -18,7 +18,7 @@ export function ProfileProvider({ children }) {
         setProfile(profile);
     }, [profileUrl]);
 
-    const login = React.useCallback(async (username, password) => {
+    const login = useCallback(async (username, password) => {
         await fetch(loginUrl, {
             method: 'POST',
             headers: {
@@ -31,13 +31,13 @@ export function ProfileProvider({ children }) {
         await updateProfile();
     }, [loginUrl, updateProfile]);
 
-    const logout = React.useCallback(async () => {
+    const logout = useCallback(async () => {
         await fetch(logoutUrl, { method: 'POST', credentials: 'include' });
 
         await updateProfile();
     }, [logoutUrl, updateProfile]);
 
-    const setParty = React.useCallback(async (partyId) => {
+    const setParty = useCallback(async (partyId) => {
         await fetch(profileUrl, {
             method: 'POST',
             headers: {
@@ -50,7 +50,7 @@ export function ProfileProvider({ children }) {
         await updateProfile();
     }, [profileUrl, updateProfile]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         updateProfile();
     }, [updateProfile]);
 
@@ -62,17 +62,17 @@ export function ProfileProvider({ children }) {
 }
 
 export function useProfile() {
-    return React.useContext(ProfileContext).profile;
+    return useContext(ProfileContext).profile;
 }
 
 export function useLogin() {
-    return React.useContext(ProfileContext).login;
+    return useContext(ProfileContext).login;
 }
 
 export function useLogout() {
-    return React.useContext(ProfileContext).logout;
+    return useContext(ProfileContext).logout;
 }
 
 export function useSetParty() {
-    return React.useContext(ProfileContext).setParty;
+    return useContext(ProfileContext).setParty;
 }
