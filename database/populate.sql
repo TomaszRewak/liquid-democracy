@@ -3,7 +3,6 @@ INSERT INTO
   users (name, password, password_salt)
 VALUES
   ('Alice', 'dc90cf07de907ccc64636ceddb38e552a1a0d984743b1f36a447b73877012c39', 'salt1'),
-  ('Bob', 'dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf', 'salt2'),
   ('Charlie', 'password3', 'salt3'),
   ('Dave', 'password4', 'salt4'),
   ('Eve', 'password5', 'salt5'),
@@ -13,6 +12,7 @@ VALUES
   ('Ivan', 'password9', 'salt9'),
   ('Judy', 'password10', 'salt10'),
   ('Karen', 'password11', 'salt11'),
+  ('Bob', 'dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf', 'salt2'),
   ('Liam', 'password12', 'salt12'),
   ('Mia', 'password13', 'salt13'),
   ('Noah', 'password14', 'salt14'),
@@ -54,28 +54,28 @@ VALUES
   ('Ximena', 'password50', 'salt50');
 
 INSERT INTO
-  polls (name, description, start, end)
+  polls (name, description, start_time, end_time)
 VALUES
-  ('Do you like dogs?', 'This poll is about your affinity towards dogs.', NOW() - INTERVAL 1 MONTH, NOW() - INTERVAL 2 WEEK),
-  ('Do you prefer summer over winter?', 'This poll is about your preference between summer and winter.', NOW() - INTERVAL 2 WEEK, NOW() + INTERVAL 2 WEEK),
-  ('Do you like spicy food?', 'This poll is about your taste for spicy food.', NOW() + INTERVAL 2 WEEK, NOW() + INTERVAL 1 MONTH),
-  ('Do you enjoy playing video games?', 'This poll is about your interest in playing video games.', NOW() + INTERVAL 1 MONTH, NOW() + INTERVAL 2 MONTH),
-  ('Do you like to travel?', 'This poll is about your interest in traveling.', NOW() + INTERVAL 2 MONTH, NOW() + INTERVAL 3 MONTH),
-  ('Do you prefer coffee over tea?', 'This poll is about your preference between coffee and tea.', NOW() + INTERVAL 3 MONTH, NOW() + INTERVAL 4 MONTH),
-  ('Do you like to read books?', 'This poll is about your interest in reading books.', NOW() + INTERVAL 4 MONTH, NOW() + INTERVAL 5 MONTH),
-  ('Do you enjoy watching movies?', 'This poll is about your interest in watching movies.', NOW() + INTERVAL 5 MONTH, NOW() + INTERVAL 6 MONTH),
-  ('Do you like to cook?', 'This poll is about your interest in cooking.', NOW() + INTERVAL 6 MONTH, NOW() + INTERVAL 7 MONTH),
-  ('Do you prefer the beach over the mountains?', 'This poll is about your preference between the beach and the mountains.', NOW() + INTERVAL 7 MONTH, NOW() + INTERVAL 8 MONTH),
-  ('Do you like to exercise?', 'This poll is about your interest in exercising.', NOW() + INTERVAL 8 MONTH, NOW() + INTERVAL 9 MONTH),
-  ('Do you enjoy listening to music?', 'This poll is about your interest in listening to music.', NOW() + INTERVAL 9 MONTH, NOW() + INTERVAL 10 MONTH),
-  ('Do you like to dance?', 'This poll is about your interest in dancing.', NOW() + INTERVAL 10 MONTH, NOW() + INTERVAL 11 MONTH),
-  ('Do you prefer sweet over savory food?', 'This poll is about your preference between sweet and savory food.', NOW() + INTERVAL 11 MONTH, NOW() + INTERVAL 12 MONTH),
-  ('Do you like to play sports?', 'This poll is about your interest in playing sports.', NOW() + INTERVAL 12 MONTH, NOW() + INTERVAL 13 MONTH),
-  ('Do you enjoy going to concerts?', 'This poll is about your interest in going to concerts.', NOW() + INTERVAL 13 MONTH, NOW() + INTERVAL 14 MONTH),
-  ('Do you like to paint or draw?', 'This poll is about your interest in painting or drawing.', NOW() + INTERVAL 14 MONTH, NOW() + INTERVAL 15 MONTH),
-  ('Do you prefer the city over the countryside?', 'This poll is about your preference between the city and the countryside.', NOW() + INTERVAL 15 MONTH, NOW() + INTERVAL 16 MONTH),
-  ('Do you like to sing?', 'This poll is about your interest in singing.', NOW() + INTERVAL 16 MONTH, NOW() + INTERVAL 17 MONTH),
-  ('Do you enjoy going to the theater?', 'This poll is about your interest in going to the theater.', NOW() + INTERVAL 17 MONTH, NOW() + INTERVAL 18 MONTH);
+  ('Do you like dogs?', 'This poll is about your affinity towards dogs.', NOW() - INTERVAL '1 month', NOW() - INTERVAL '2 weeks'),
+  ('Do you prefer summer over winter?', 'This poll is about your preference between summer and winter.', NOW() - INTERVAL '1 month', NOW() - INTERVAL '2 weeks'),
+  ('Do you like spicy food?', 'This poll is about your taste for spicy food.', NOW() - INTERVAL '1 month', NOW() - INTERVAL '2 weeks'),
+  ('Do you enjoy playing video games?', 'This poll is about your interest in playing video games.', NOW() - INTERVAL '1 month', NOW() - INTERVAL '2 weeks'),
+  ('Do you like to travel?', 'This poll is about your interest in traveling.', NOW() - INTERVAL '1 month', NOW() - INTERVAL '2 weeks'),
+  ('Do you prefer coffee over tea?', 'This poll is about your preference between coffee and tea.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '10 minutes'),
+  ('Do you like to read books?', 'This poll is about your interest in reading books.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 hour'),
+  ('Do you enjoy watching movies?', 'This poll is about your interest in watching movies.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you like to cook?', 'This poll is about your interest in cooking.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you prefer the beach over the mountains?', 'This poll is about your preference between the beach and the mountains.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you like to exercise?', 'This poll is about your interest in exercising.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you enjoy listening to music?', 'This poll is about your interest in listening to music.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you like to dance?', 'This poll is about your interest in dancing.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you prefer sweet over savory food?', 'This poll is about your preference between sweet and savory food.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you like to play sports?', 'This poll is about your interest in playing sports.', NOW() - INTERVAL '1 week', NOW() + INTERVAL '1 week'),
+  ('Do you enjoy going to concerts?', 'This poll is about your interest in going to concerts.', NOW() + INTERVAL '2 months', NOW() + INTERVAL '3 months'),
+  ('Do you like to paint or draw?', 'This poll is about your interest in painting or drawing.', NOW() + INTERVAL '2 months', NOW() + INTERVAL '3 months'),
+  ('Do you prefer the city over the countryside?', 'This poll is about your preference between the city and the countryside.', NOW() + INTERVAL '2 months', NOW() + INTERVAL '3 months'),
+  ('Do you like to sing?', 'This poll is about your interest in singing.', NOW() + INTERVAL '2 months', NOW() + INTERVAL '3 months'),
+  ('Do you enjoy going to the theater?', 'This poll is about your interest in going to the theater.', NOW() + INTERVAL '2 months', NOW() + INTERVAL '3 months');
 
 INSERT INTO
   parties (name, color)
@@ -86,3 +86,58 @@ VALUES
   ('Cool Party', 'yellow'),
   ('Great Party', 'purple');
 
+INSERT INTO
+  party_affiliations (user_id, party_id, is_member)
+VALUES
+  (1, 3, TRUE),
+  (2, 2, TRUE),
+  (3, 4, TRUE),
+  (4, 1, TRUE),
+  (5, 5, TRUE),
+  (6, 2, TRUE),
+  (7, 3, TRUE),
+  (8, 1, TRUE),
+  (9, 4, TRUE),
+  (10, 5, TRUE),
+  (11, 1, FALSE),
+  (12, 2, FALSE),
+  (13, 3, FALSE),
+  (14, 4, FALSE),
+  (15, 5, FALSE),
+  (16, 1, FALSE),
+  (17, 2, FALSE),
+  (18, 3, FALSE),
+  (19, 4, FALSE),
+  (20, 5, FALSE),
+  (21, 1, FALSE),
+  (22, 2, FALSE),
+  (23, 3, FALSE),
+  (24, 4, FALSE),
+  (25, 5, FALSE),
+  (26, 1, FALSE),
+  (27, 2, FALSE),
+  (28, 3, FALSE),
+  (29, 4, FALSE),
+  (30, 5, FALSE),
+  (31, 1, FALSE),
+  (32, 2, FALSE),
+  (33, 3, FALSE),
+  (34, 4, FALSE),
+  (35, 5, FALSE),
+  (36, 1, FALSE),
+  (37, 2, FALSE),
+  (38, 3, FALSE),
+  (39, 4, FALSE),
+  (40, 5, FALSE);
+
+  -- Generate random yea/nay votes for each poll and randomly skip half of the votes
+INSERT INTO votes (user_id, poll_id, vote_type)
+SELECT user_id, poll_id, CASE floor(random() * 2) WHEN 0 THEN 'yea'::vote_type ELSE 'nay'::vote_type END AS vote_type
+FROM (
+  SELECT user_id, poll_id
+  FROM (
+    SELECT DISTINCT user_id, poll_id
+    FROM generate_series(1, 50) AS user_id, generate_series(1, 15) AS poll_id
+  ) AS user_poll_combinations
+) AS numbered_user_poll_combinations
+WHERE floor(random() * 2) = 0;

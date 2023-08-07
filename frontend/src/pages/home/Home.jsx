@@ -10,7 +10,7 @@ export default function Home() {
         <div>
             {polls.map(poll => (
                 <Segment key={poll.id}>
-                    <Header as='h2'>
+                    <Header as='h4'>
                         {poll.name}
                         <Link to={`/poll/${poll.id}`}>
                             <Icon name='external alternate' />
