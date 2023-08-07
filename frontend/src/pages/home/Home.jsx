@@ -1,27 +1,10 @@
-import { useEffect, useState } from 'react';
-import useApiUrl from '../../effects/useApiUrl';
 import { Link } from 'react-router-dom';
-import { Card, Divider, Header, Icon, Segment } from 'semantic-ui-react';
+import { Divider, Header, Icon, Segment } from 'semantic-ui-react';
 import Chart from '../../components/Chart';
+import { usePolls } from '../../contexts/pollsContext';
 
 export default function Home() {
-    const [polls, setPolls] = useState(undefined)
-    const pollsUrl = useApiUrl('polls');
-
-    useEffect(() => {
-        const getPolls = async () => {
-            const response = await fetch(pollsUrl, { credentials: 'include' });
-            const data = await response.json();
-
-            setPolls(data.polls);
-        }
-
-        getPolls();
-    }, [pollsUrl]);
-
-    if (polls === undefined) {
-        return <div>Loading...</div>
-    }
+    const polls = usePolls();
 
     return (
         <div>
