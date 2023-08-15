@@ -55,3 +55,57 @@ CREATE TABLE party_affiliations (
   is_member BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Write me a postgres query that selects the number of electorial votes and popular votes for a given poll grouped by party id (including unaffiliated) and vote type (yea/nay). Popular votes are the votes cast directly by users. If the user did not cast a vote in a given poll and is affiliated with a party, his vote should be counted towards electorial votes with a yea/nay ratio equal to the ratio between yea/nay votes of that party members (please note it will be a fractional number). Think step by step and ask any follow up questions if needed.
+
+WITH
+end_time AS (
+  SELECT
+    polls.end_time AS end_time
+  FROM
+    polls
+  WHERE
+    polls.id = $1
+),
+current_party_affiliations AS (
+  SELECT DISTINCT ON (party_affiliations.user_id)
+    party_affiliations.user_id AS user_id,
+    party_affiliations.party_id AS party_id,
+    party_affiliations.is_member AS is_member
+  FROM
+    party_affiliations
+  INNER JOIN
+    end_time ON end_time.end_time >= party_affiliations.created_at
+  ORDER BY
+    party_affiliations.user_id,
+    party_affiliations.created_at DESC
+),
+all_votes AS (
+  SELECT DISTINCT ON (votes.user_id)
+    votes.vote_type AS vote_type,
+    current_party_affiliations.party_id AS party_id,
+    current_party_affiliations.is_member AS is_member
+  FROM
+    votes
+  LEFT JOIN
+    current_party_affiliations ON current_party_affiliations.user_id = votes.user_id
+  WHERE
+    votes.poll_id = $1
+  ORDER BY
+    votes.user_id,
+    votes.created_at DESC
+),
+party_votes AS (
+  SELECT
+    party_id,
+    COUNT(*) FILTER (WHERE vote_type = 'yea') AS yea_votes,
+    COUNT(*) FILTER (WHERE vote_type = 'nay') AS nay_votes,
+  FROM
+    all_votes
+  GROUP BY
+    party_id
+),
+electorial_votes AS (
+  SELECT
+    
+)

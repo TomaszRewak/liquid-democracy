@@ -3,9 +3,26 @@ use axum::{extract::Path, response::Json as JsonResponse, Extension};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct VoteRatio {
+    yes_votes: f64,
+    no_votes: f64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct VoteBreakdown {
+    electorial_votes: VoteRatio,
+    popular_votes: VoteRatio,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct VotesByParty {
+    party: Option<String>,
+    votes: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct GetPollResultsResponse {
-    pub yes_votes: i64,
-    pub no_votes: i64,
+    votes_by_party: Vec<VotesByParty>,
 }
 
 pub async fn get(
