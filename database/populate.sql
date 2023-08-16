@@ -80,9 +80,7 @@ VALUES
 INSERT INTO
   parties (name, color)
 VALUES
-  ('Nice Party', 'red'),
   ('Super Party', 'blue'),
-  ('Awesome Party', 'green'),
   ('Cool Party', 'yellow'),
   ('Great Party', 'purple');
 
@@ -91,33 +89,33 @@ INSERT INTO
 VALUES
   (1, 3, TRUE),
   (2, 2, TRUE),
-  (3, 4, TRUE),
+  (3, 1, TRUE),
   (4, 1, TRUE),
-  (5, 5, TRUE),
+  (5, 2, TRUE),
   (6, 2, TRUE),
   (7, 3, TRUE),
   (8, 1, TRUE),
-  (9, 4, TRUE),
-  (10, 5, TRUE),
+  (9, 1, TRUE),
+  (10, 2, TRUE),
   (11, 1, FALSE),
   (12, 2, FALSE),
   (13, 3, FALSE),
-  (14, 4, FALSE),
-  (15, 5, FALSE),
+  (14, 1, FALSE),
+  (15, 2, FALSE),
   (16, 1, FALSE),
   (17, 2, FALSE),
   (18, 3, FALSE),
-  (19, 4, FALSE),
+  (19, 1, FALSE),
   (31, 1, FALSE),
   (32, 2, FALSE),
   (33, 3, FALSE),
-  (34, 4, FALSE),
-  (35, 5, FALSE),
+  (34, 1, FALSE),
+  (35, 2, FALSE),
   (36, 1, FALSE),
   (37, 2, FALSE),
   (38, 3, FALSE),
-  (39, 4, FALSE),
-  (40, 5, FALSE);
+  (39, 2, FALSE),
+  (40, 2, FALSE);
 
   -- Generate random yea/nay votes for each poll and randomly skip half of the votes
 INSERT INTO votes (user_id, poll_id, vote_type)
