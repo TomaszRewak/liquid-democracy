@@ -4,20 +4,21 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VoteRatio {
-    yes_votes: f64,
-    no_votes: f64,
+    yea: f64,
+    nay: f64,
+    abstain: f64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VoteBreakdown {
-    electorial_votes: VoteRatio,
-    popular_votes: VoteRatio,
+    electorial: VoteRatio,
+    popular: VoteRatio,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VotesByParty {
-    party: Option<String>,
-    votes: i64,
+    party: Option<i32>,
+    votes: VoteBreakdown,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -31,8 +32,8 @@ pub async fn get(
 ) -> JsonResponse<GetPollResultsResponse> {
     let connection = data_context.get_connection().await;
 
-    let counts = connection
-        .query_one(
+    let query_result = connection
+        .query(
             "
                 WITH
                 end_time AS (
@@ -139,13 +140,37 @@ pub async fn get(
         .await
         .unwrap();
 
-    let yes_votes = counts.get("yes_votes");
-    let no_votes = counts.get("no_votes");
+    let mut votes_by_party: Vec<VotesByParty> = Vec::new();
 
-    let response = GetPollResultsResponse {
-        yes_votes,
-        no_votes,
-    };
+    for row in query_result {
+        let party_id: Option<i32> = row.get(0);
+        let electorial_yea_votes: f64 = row.get(1);
+        let electorial_nay_votes: f64 = row.get(2);
+        let electorial_abstain_votes: f64 = row.get(3);
+        let popular_yea_votes: i64 = row.get(4);
+        let popular_nay_votes: i64 = row.get(5);
+        let popular_abstain_votes: i64 = row.get(6);
+
+        let votes = VotesByParty {
+            party: party_id,
+            votes: VoteBreakdown {
+                electorial: VoteRatio {
+                    yea: electorial_yea_votes,
+                    nay: electorial_nay_votes,
+                    abstain: electorial_abstain_votes,
+                },
+                popular: VoteRatio {
+                    yea: popular_yea_votes as f64,
+                    nay: popular_nay_votes as f64,
+                    abstain: popular_abstain_votes as f64,
+                },
+            },
+        };
+
+        votes_by_party.push(votes);
+    }
+
+    let response = GetPollResultsResponse { votes_by_party };
 
     JsonResponse(response)
 }

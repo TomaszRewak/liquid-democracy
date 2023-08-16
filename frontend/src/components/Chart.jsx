@@ -15,20 +15,33 @@ function generateArcPath(outerRadius, innerRadius, startPercent, endPercent) {
 }
 
 export default function Chart({ results }) {
-    // results: [{party: 'party a', electorialVotes: {yea: 10, nay: 5}, popularVotes: {yea: 100, nay: 50}}, ...]
+    // results: [{party: 1, votes: {electorial: {yea: 10, nay: 5, abstain: 0}, popular: {yea: 100, nay: 50.5, abstain: 10}}}, ...]
 
-    // const yeaVotes = results.reduce((acc, result) => acc + result.electorialVotes.yea + result.popularVotes.yea, 0);
-    // const nayVotes = results.reduce((acc, result) => acc + result.electorialVotes.nay + result.popularVotes.nay, 0);
-    // const totalVotes = yeaVotes + nayVotes;
+    const totalYeaVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.yea + cur.votes.popular.yea, 0);
+    const totalNayVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.nay + cur.votes.popular.nay, 0);
+    const totalAbstainVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.abstain + cur.votes.popular.abstain, 0);
+    const totalVotes = totalYeaVotes + totalNayVotes + totalAbstainVotes;
 
+    if (!totalVotes) return (
+        <div>No votes</div>
+    );
 
+    const yeaPercent = totalYeaVotes / totalVotes;
+    const nayPercent = totalNayVotes / totalVotes;
+    const abstainPercent = totalAbstainVotes / totalVotes;
+
+    const yeaOffset = 0;
+    const nayOffset = yeaOffset + yeaPercent;
+    const abstainOffset = nayOffset + nayPercent;
+
+    console.log(yeaPercent, nayPercent, abstainPercent)
 
     // TODO: draw a pie chart
     return <svg width="200" height="200" viewBox="0 0 200 200">
         <g transform="translate(100,100)">
-            <path d={generateArcPath(80, 20, 0, 0.7)} fill="#4ac234" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(80, 20, 0.7, 0.9)} fill="#eb3434" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(80, 20, 0.9, 1)} fill="gray" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, yeaOffset, yeaOffset + yeaPercent)} fill="#4ac234" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, nayOffset, nayOffset + nayPercent)} fill="#eb3434" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 20, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={4.5} />
 
             <path d={generateArcPath(80, 100, 0, 0.3)} fill="red" stroke="white" strokeWidth={4.5} />
             <path d={generateArcPath(80, 100, 0.3, 0.7)} fill="blue" stroke="white" strokeWidth={4.5} />

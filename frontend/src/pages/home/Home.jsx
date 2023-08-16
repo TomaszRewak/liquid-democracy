@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Divider, Header, Icon, Segment } from 'semantic-ui-react';
-import Chart from '../../components/Chart';
 import { usePolls } from '../../contexts/pollsContext';
+import PollCard from './PollCard';
 
 export default function Home() {
     const polls = usePolls();
@@ -17,9 +17,8 @@ export default function Home() {
                             </Link>
                     </Header>
                     <Divider />
-                    <Chart/>
+                    <PollCard pollId={poll.id} />
                     <p>{poll.description}</p>
-
                 </Segment>
             ))}
         </div>
