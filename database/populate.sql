@@ -121,7 +121,16 @@ VALUES
 
   -- Generate random yea/nay votes for each poll and randomly skip half of the votes
 INSERT INTO votes (user_id, poll_id, vote_type)
-SELECT user_id, poll_id, CASE floor(random() * 2) WHEN 0 THEN 'yea'::vote_type ELSE 'nay'::vote_type END AS vote_type
+SELECT
+  user_id,
+  poll_id,
+  CASE floor(random() * 5)
+    WHEN 0 THEN 'yea'::vote_type
+    WHEN 1 THEN 'yea'::vote_type
+    WHEN 2 THEN 'nay'::vote_type
+    WHEN 3 THEN 'nay'::vote_type
+    ELSE 'abstain'::vote_type
+  END AS vote_type
 FROM (
   SELECT user_id, poll_id
   FROM (

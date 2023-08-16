@@ -14,6 +14,34 @@ function generateArcPath(outerRadius, innerRadius, startPercent, endPercent) {
         ' Z'; // Close path
 }
 
+function getSegments(results, totalVotes) {
+    const segments = [];
+    let offset = 0;
+
+    let addSegment = (votes, color) => {
+        if (!votes) return;
+
+        const percent = votes / totalVotes;
+        segments.push({ percent: percent, offset: offset, color: color });
+        offset += percent;
+    };
+
+    for (const party of results) {
+        addSegment(party.votes.electorial.yea, "green");
+        addSegment(party.votes.popular.yea, "lightgreen");
+    }
+    for (const party of results) {
+        addSegment(party.votes.electorial.nay, "red");
+        addSegment(party.votes.popular.nay, "pink");
+    }
+    for (const party of results) {
+        addSegment(party.votes.electorial.abstain, "gray");
+        addSegment(party.votes.popular.abstain, "lightgray");
+    }
+
+    return segments;
+}
+
 export default function Chart({ results }) {
     // results: [{party: 1, votes: {electorial: {yea: 10, nay: 5, abstain: 0}, popular: {yea: 100, nay: 50.5, abstain: 10}}}, ...]
 
@@ -34,7 +62,7 @@ export default function Chart({ results }) {
     const nayOffset = yeaOffset + yeaPercent;
     const abstainOffset = nayOffset + nayPercent;
 
-    console.log(yeaPercent, nayPercent, abstainPercent)
+    const segments = getSegments(results, totalVotes);
 
     // TODO: draw a pie chart
     return <svg width="200" height="200" viewBox="0 0 200 200">
@@ -43,10 +71,16 @@ export default function Chart({ results }) {
             <path d={generateArcPath(80, 20, nayOffset, nayOffset + nayPercent)} fill="#eb3434" stroke="white" strokeWidth={4.5} />
             <path d={generateArcPath(80, 20, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={4.5} />
 
-            <path d={generateArcPath(80, 100, 0, 0.3)} fill="red" stroke="white" strokeWidth={4.5} />
+            {
+                segments.map((segment, i) => {
+                    return <path key={i} d={generateArcPath(80, 100, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={4.5} />
+                })
+            }
+
+            {/* <path d={generateArcPath(80, 100, 0, 0.3)} fill="red" stroke="white" strokeWidth={4.5} />
             <path d={generateArcPath(80, 100, 0.3, 0.7)} fill="blue" stroke="white" strokeWidth={4.5} />
             <path d={generateArcPath(80, 100, 0.7, 0.9)} fill="blue" stroke="white" strokeWidth={4.5} />
-            <path d={generateArcPath(80, 100, 0.9, 1)} fill="blue" stroke="white" strokeWidth={4.5} />
+            <path d={generateArcPath(80, 100, 0.9, 1)} fill="blue" stroke="white" strokeWidth={4.5} /> */}
         </g>
     </svg>
 }
