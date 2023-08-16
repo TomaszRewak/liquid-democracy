@@ -60,15 +60,15 @@ function getBreakdownSegments(results, totalVotes) {
     };
 
     for (const party of results) {
-        addSegment(party.votes.popular.yea, "#21ba45");
+        addSegment(party.votes.popular.yea, "#4bc968");
         addSegment(party.votes.electorial.yea, "#b1debc");
     }
     for (const party of results) {
-        addSegment(party.votes.popular.nay, "#db2828");
+        addSegment(party.votes.popular.nay, "#e35656");
         addSegment(party.votes.electorial.nay, "#e8a0a0");
     }
     for (const party of results) {
-        addSegment(party.votes.popular.abstain, "gray");
+        addSegment(party.votes.popular.abstain, "#a3a3a3");
         addSegment(party.votes.electorial.abstain, "lightgray");
     }
 
@@ -126,24 +126,32 @@ export default function Chart({ results }) {
     const breakdownSegments = getBreakdownSegments(results, totalVotes);
     const partySegments = getPartySegments(results, totalVotes);
 
-    // TODO: draw a pie chart
+    const resolutionColor =
+        yeaPercent > 0.5 ? "#21ba45" :
+            nayPercent > 0.5 ? "#db2828" :
+                "gray";
+
+    // TODO: Make the animation of rotation work better
     return <svg width="200" height="200" viewBox="0 0 200 200">
         <g transform="translate(100,100)">
-            <path d={generateArcPath(20, 100, yeaOffset, yeaOffset + yeaPercent)} fill="#21ba45" stroke="white" strokeWidth={0} />
-            <path d={generateArcPath(20, 100, nayOffset, nayOffset + nayPercent)} fill="#db2828" stroke="white" strokeWidth={0} />
-            <path d={generateArcPath(20, 100, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={0} />
+            <circle cx="0" cy="0" r="10" fill={resolutionColor} stroke="white" strokeWidth={1} />
+
+            <path d={generateArcPath(20, 95, yeaOffset, yeaOffset + yeaPercent)} fill="#21ba45" stroke="white" strokeWidth={0} />
+            <path d={generateArcPath(20, 95, nayOffset, nayOffset + nayPercent)} fill="#db2828" stroke="white" strokeWidth={0} />
+            <path d={generateArcPath(20, 95, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={0} />
 
             {
                 breakdownSegments.map((segment, i) => {
-                    return <path key={i} d={generateArcPath(55, 95, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={0} />
+                    return <path key={i} d={generateArcPath(60, 90, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={0} />
                 })
             }
 
             {
                 partySegments.map((segment, i) => {
-                    return <path key={i} d={generateArcPath(80, 90, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={1} />
+                    return <path key={i} d={generateArcPath(70, 80, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={1.5} />
                 })
             }
+
         </g>
     </svg>
 }
