@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Divider, Header, Icon, Segment } from 'semantic-ui-react';
+import { Card, Divider, Header, Icon, Segment } from 'semantic-ui-react';
 import { usePolls } from '../../contexts/pollsContext';
 import PollCard from './PollCard';
 
@@ -7,20 +7,29 @@ export default function Home() {
     const polls = usePolls();
 
     return (
-        <div>
+        <Card.Group itemsPerRow={3}>
             {polls.map(poll => (
-                <Segment key={poll.id}>
-                    <Header as='h4'>
-                        {poll.name}
+                <Card fluid key={poll.id}>
+                    <Card.Content>
+                        <Card.Header>
+                            {poll.name}
+                        </Card.Header>
+                        <Card.Meta>{poll.description}</Card.Meta>
+                    </Card.Content>
+                    <Card.Content extra textAlign='center'>
+                        <PollCard pollId={poll.id} />
+                    </Card.Content>
+                    <Card.Content extra textAlign='right'>
                         <Link to={`/poll/${poll.id}`}>
                             <Icon name='external alternate' />
-                            </Link>
-                    </Header>
-                    <Divider />
-                    <PollCard pollId={poll.id} />
-                    <p>{poll.description}</p>
-                </Segment>
+                        </Link>
+                    </Card.Content>
+                    <Card.Content extra textAlign='right'>
+                        <Icon name='clock' />
+                        1w 2d 03h 04m 05s
+                    </Card.Content>
+                </Card>
             ))}
-        </div>
+        </Card.Group>
     );
 }

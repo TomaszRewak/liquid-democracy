@@ -21,7 +21,7 @@ export const PollProvider = ({ pollId, children }) => {
         const data = await response.json();
         const results = data.votes_by_party.map(vote => ({
             ...vote,
-            party_details: partyLookup[vote.party]
+            party_details: partyLookup[vote.party] ?? partyLookup[null]
         }));
         setPollResults(results);
     }, [partyLookup, pollResultsUrl]);
