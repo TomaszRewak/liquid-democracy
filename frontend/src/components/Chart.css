@@ -1,5 +1,5 @@
 svg path {
-    transition: all 0.2s ease-in-out;
+    /* transition: all 0.2s ease-in-out; */
 }
 
 svg:hover path:not(:hover) {

@@ -1,12 +1,20 @@
-import { createContext, useCallback, useContext } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import useApiUrl from '../effects/useApiUrl';
 import { useFetchPollResults } from "./pollContext";
 
 const VotingContext = createContext();
 
 export const VotingProvider = ({ pollId, children }) => {
+    const [voteType, setVoteType] = useState(null);
     const voteUrl = useApiUrl('vote');
     const fetchPollResults = useFetchPollResults();
+
+    const fetchVoteType = useCallback(async () => {
+        const response = await fetch(`${voteUrl}/${pollId}`, { credentials: 'include' });
+        const data = await response.json();
+        console.log("data: ", pollId, ", ", data);
+        setVoteType(data);
+    }, [pollId, voteUrl]);
 
     const castVote = useCallback(async (voteType) => {
         console.dir(JSON.stringify({
@@ -27,11 +35,16 @@ export const VotingProvider = ({ pollId, children }) => {
             credentials: 'include'
         });
 
-        fetchPollResults();
-    }, [fetchPollResults, pollId, voteUrl]);
+        await fetchVoteType();
+        await fetchPollResults();
+    }, [fetchPollResults, fetchVoteType, pollId, voteUrl]);
+
+    useEffect(() => {
+        fetchVoteType();
+    }, [fetchVoteType]);
 
     return (
-        <VotingContext.Provider value={{ castVote }}>
+        <VotingContext.Provider value={{ castVote, voteType }}>
             {children}
         </VotingContext.Provider>
     );
@@ -39,4 +52,8 @@ export const VotingProvider = ({ pollId, children }) => {
 
 export function useCastVote() {
     return useContext(VotingContext).castVote;
+}
+
+export function useVoteType() {
+    return useContext(VotingContext).voteType;
 }

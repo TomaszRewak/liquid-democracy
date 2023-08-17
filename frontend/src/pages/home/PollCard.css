@@ -1,0 +1,3 @@
+.voting-button.unselected:not(:hover) {
+    opacity: 0.3;
+}

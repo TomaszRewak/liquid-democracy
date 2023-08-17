@@ -27,6 +27,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/vote", post(routes::vote::post))
+        .route("/vote/:poll_id", get(routes::vote::get))
         .route("/polls", get(routes::polls::get))
         .route("/polls/:poll_id/results", get(routes::poll_results::get))
         .route("/profile", get(routes::profile::get))
