@@ -41,3 +41,6 @@ export function usePollResults() {
     return useContext(PollContext).pollResults;
 }
 
+export function useFetchPollResults() {
+    return useContext(PollContext).fetchPollResults;
+}

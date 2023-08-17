@@ -7,6 +7,7 @@ use tokio_postgres::types::{IsNull, ToSql, Type};
 pub enum VoteType {
     Yea,
     Nay,
+    Abstain,
 }
 
 impl ToSql for VoteType {
@@ -14,6 +15,7 @@ impl ToSql for VoteType {
         match self {
             VoteType::Yea => out.extend_from_slice(b"yea"),
             VoteType::Nay => out.extend_from_slice(b"nay"),
+            VoteType::Abstain => out.extend_from_slice(b"abstain"),
         }
         Ok(IsNull::No)
     }
