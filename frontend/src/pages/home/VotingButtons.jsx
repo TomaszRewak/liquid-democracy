@@ -23,7 +23,7 @@ function VotingButton({ newVotewType, color }) {
 
 export function VotingButtons() {
     return (
-        <Button.Group size="tiny">
+        <Button.Group size="tiny" className="voting-buttons-group">
             <VotingButton newVotewType='Yea' color='green' />
             <Button.Or />
             <VotingButton newVotewType='Nay' color='red' />

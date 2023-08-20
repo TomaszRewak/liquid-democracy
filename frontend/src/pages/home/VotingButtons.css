@@ -1,3 +1,13 @@
+.voting-buttons-group {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.voting-button {
+    width: 0;
+}
+
 .voting-button:not(.selected):not(:hover) {
     opacity: 0.3;
     background: #00000029 !important;
