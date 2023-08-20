@@ -134,19 +134,19 @@ export default function Chart({ results }) {
             <path d={generateArcPath(10, 20, nayOffset, nayOffset + nayPercent)} fill="#db2828" stroke="white" strokeWidth={0} />
             <path d={generateArcPath(10, 20, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={0} />
 
-            <path d={generateArcPath(21.5, 95, yeaOffset, yeaOffset + yeaPercent)} fill="#21ba45" stroke="white" strokeWidth={0} />
-            <path d={generateArcPath(21.5, 95, nayOffset, nayOffset + nayPercent)} fill="#db2828" stroke="white" strokeWidth={0} />
-            <path d={generateArcPath(21.5, 95, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={0} />
+            <path d={generateArcPath(21.5, 96, yeaOffset, yeaOffset + yeaPercent)} fill="#21ba45" stroke="white" strokeWidth={0} />
+            <path d={generateArcPath(21.5, 96, nayOffset, nayOffset + nayPercent)} fill="#db2828" stroke="white" strokeWidth={0} />
+            <path d={generateArcPath(21.5, 96, abstainOffset, abstainOffset + abstainPercent)} fill="gray" stroke="white" strokeWidth={0} />
 
             {
                 breakdownSegments.map((segment, i) => {
-                    return <path key={i} d={generateArcPath(60, 90, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={0} />
+                    return <path key={i} d={generateArcPath(60, 95, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={0} />
                 })
             }
 
             {
                 partySegments.map((segment, i) => {
-                    return <path key={i} d={generateArcPath(70, 80, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={1.5} />
+                    return <path key={i} d={generateArcPath(75, 85, segment.offset, segment.offset + segment.percent)} fill={segment.color} stroke="white" strokeWidth={1.5} />
                 })
             }
 

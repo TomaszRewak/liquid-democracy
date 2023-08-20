@@ -1,0 +1,19 @@
+.chart-card-content {
+    background-color: #f9fafb !important;
+}
+
+.statistics-column {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: end !important;
+    right: -45px !important;
+    gap: 10px !important;
+}
+
+.statistics-column i {
+    margin: 0 !important;
+}
+
+.header a {
+    color: black;
+}
