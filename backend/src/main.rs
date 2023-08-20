@@ -30,6 +30,7 @@ async fn main() {
         .route("/vote/:poll_id", get(routes::vote::get))
         .route("/polls", get(routes::polls::get))
         .route("/polls/:poll_id/results", get(routes::poll_results::get))
+        .route("/polls/:poll_id", get(routes::poll::get))
         .route("/profile", get(routes::profile::get))
         .route("/profile", post(routes::profile::post))
         .route("/parties", get(routes::parties::get))

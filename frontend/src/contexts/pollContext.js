@@ -5,7 +5,9 @@ import { useParties } from "./partiesContext";
 const PollContext = createContext();
 
 export const PollProvider = ({ pollId, children }) => {
+    const [pollDetails, setPollDetails] = useState({});
     const [pollResults, setPollResults] = useState([]);
+    const pollDetailsUrl = useApiUrl(`polls/${pollId}`);
     const pollResultsUrl = useApiUrl(`polls/${pollId}/results`);
     const parties = useParties();
 
@@ -15,6 +17,12 @@ export const PollProvider = ({ pollId, children }) => {
             [null]: { name: 'Unaffiliated', color: 'gray' }
         };
     }, [parties]);
+
+    const fetchPollDetails = useCallback(async () => {
+        const response = await fetch(pollDetailsUrl, { credentials: 'include' });
+        const data = await response.json();
+        setPollDetails(data);
+    }, [pollDetailsUrl]);
 
     const fetchPollResults = useCallback(async () => {
         const response = await fetch(pollResultsUrl, { credentials: 'include' });
@@ -27,15 +35,23 @@ export const PollProvider = ({ pollId, children }) => {
     }, [partyLookup, pollResultsUrl]);
 
     useEffect(() => {
+        fetchPollDetails();
+    }, [fetchPollDetails]);
+
+    useEffect(() => {
         fetchPollResults();
     }, [fetchPollResults]);
 
     return (
-        <PollContext.Provider value={{ pollResults, fetchPollResults }}>
+        <PollContext.Provider value={{ pollDetails, pollResults, fetchPollResults }}>
             {children}
         </PollContext.Provider>
     );
 };
+
+export function usePollDetails() {
+    return useContext(PollContext).pollDetails;
+}
 
 export function usePollResults() {
     return useContext(PollContext).pollResults;

@@ -107,7 +107,7 @@ function App() {
                         <Input></Input>
                     </Segment>
                     <Routes>
-                        <Route path='/' element={<PollsProvider><Home /></PollsProvider>} />
+                        <Route path='/' element={<Home />} />
                         <Route path='/poll/:pollId' element={<Poll />} />
                     </Routes>
                 </Container>
