@@ -17,7 +17,7 @@ function PollCardElement() {
     const totalVotes = totalYeaVotes + totalNayVotes + totalAbstainVotes;
 
     return (
-        <Card fluid>
+        <Card className='poll-card' fluid>
             <Card.Content>
                 <Card.Header>
                     <Link to={`/poll/${poll.id}`}>
@@ -46,9 +46,19 @@ function PollCardElement() {
             <Card.Content extra textAlign='center'>
                 <VotingButtons />
             </Card.Content>
-            <Card.Content extra textAlign='right'>
-                <Icon name='clock' />
-                1w 2d 03h 04m 05s
+            <Card.Content extra textAlign='center'>
+                <span className='left floated'>
+                    <Icon name='comment' />
+                    123
+                </span>
+                <span className='floated'>
+                    <Icon name='clock' />
+                    ends <span style={{opacity: 0.3}}>in</span> 1w 2d 03h
+                </span>
+                <span className='right floated' style={{color: 'orange'}}>
+                    <Icon name='bullhorn' />
+                    123
+                </span>
             </Card.Content>
         </Card>
     );

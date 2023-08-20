@@ -1,8 +1,8 @@
-.chart-card-content {
+.poll-card .chart-card-content {
     background-color: #f9fafb !important;
 }
 
-.statistics-column {
+.poll-card .statistics-column {
     display: flex !important;
     flex-direction: column !important;
     align-items: end !important;
@@ -10,10 +10,10 @@
     gap: 10px !important;
 }
 
-.statistics-column i {
+.poll-card .statistics-column i {
     margin: 0 !important;
 }
 
-.header a {
-    color: black;
+.poll-card .header a {
+    color: #474747;
 }

@@ -104,8 +104,6 @@ function getPartySegments(results, totalVotes) {
 }
 
 export default function Chart({ results }) {
-    // results: [{party: 1, votes: {electorial: {yea: 10, nay: 5, abstain: 0}, popular: {yea: 100, nay: 50.5, abstain: 10}}}, ...]
-
     const totalYeaVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.yea + cur.votes.popular.yea, 0);
     const totalNayVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.nay + cur.votes.popular.nay, 0);
     const totalAbstainVotes = results.reduce((acc, cur) => acc + cur.votes.electorial.abstain + cur.votes.popular.abstain, 0);
@@ -126,7 +124,6 @@ export default function Chart({ results }) {
     const breakdownSegments = getBreakdownSegments(results, totalVotes);
     const partySegments = getPartySegments(results, totalVotes);
 
-    // TODO: Make the animation of rotation work better
     return <svg width="200" height="200" viewBox="0 0 200 200">
         <g transform="translate(100,100)">
 

@@ -35,9 +35,7 @@ CREATE TABLE votes (
   user_id INTEGER NOT NULL REFERENCES users(id),
   poll_id INTEGER NOT NULL REFERENCES polls(id),
   vote_type vote_type NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT fk_poll_id FOREIGN KEY (poll_id) REFERENCES polls(id)
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE parties (
@@ -54,4 +52,21 @@ CREATE TABLE party_affiliations (
   party_id INTEGER REFERENCES parties(id),
   is_member BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE comments (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  poll_id INTEGER NOT NULL REFERENCES polls(id),
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
+);
+
+CREATE TABLE whistles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  poll_id INTEGER NOT NULL REFERENCES polls(id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
 );

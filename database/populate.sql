@@ -117,6 +117,58 @@ VALUES
   (39, 2, FALSE),
   (40, 2, FALSE);
 
+INSERT INTO
+  comments (user_id, poll_id, comment, created_at)
+VALUES
+  (1, 1, 'I think this poll is biased.', '2022-01-01 12:00:00'),
+  (2, 1, 'I agree with the results of this poll.', '2022-01-02 13:00:00'),
+  (3, 2, 'I think the options in this poll are too limited.', '2022-01-03 14:00:00'),
+  (4, 2, 'I don''t think this poll is relevant to the current situation.', '2022-01-04 15:00:00'),
+  (5, 3, 'I think this poll is missing some important options.', '2022-01-05 16:00:00'),
+  (6, 3, 'I don''t think this poll is well-designed.', '2022-01-06 17:00:00'),
+  (7, 4, 'I think this poll is a good representation of public opinion.', '2022-01-07 18:00:00'),
+  (8, 4, 'I don''t think this poll is accurate.', '2022-01-08 19:00:00'),
+  (9, 5, 'I think this poll is too simplistic.', '2022-01-09 20:00:00'),
+  (10, 5, 'I think this poll is well-designed.', '2022-01-10 21:00:00'),
+  (11, 3, 'I think this poll is too complex.', '2022-01-11 22:00:00'),
+  (12, 4, 'I don''t think this poll is relevant to my interests.', '2022-01-12 23:00:00'),
+  (13, 4, 'I think this poll is biased.', '2022-01-13 00:00:00'),
+  (14, 5, 'I think this poll is missing some important options.', '2022-01-14 01:00:00'),
+  (15, 5, 'I don''t think this poll is well-designed.', '2022-01-15 02:00:00'),
+  (16, 6, 'I think this poll is too simplistic.', '2022-01-16 03:00:00'),
+  (17, 6, 'I think this poll is a good representation of public opinion.', '2022-01-17 04:00:00'),
+  (18, 7, 'I don''t think this poll is accurate.', '2022-01-18 05:00:00'),
+  (19, 7, 'I think this poll is well-designed.', '2022-01-19 06:00:00'),
+  (20, 8, 'I think this poll is missing some important options.', '2022-01-20 07:00:00');
+
+INSERT INTO
+  whistles (user_id, poll_id, created_at)
+VALUES
+  (1, 1, '2022-01-01 12:00:00'),
+  (2, 1, '2022-01-01 12:01:00'),
+  (3, 2, '2022-01-02 10:00:00'),
+  (4, 2, '2022-01-02 10:01:00'),
+  (5, 3, '2022-01-03 08:00:00'),
+  (6, 3, '2022-01-03 08:01:00'),
+  (7, 4, '2022-01-04 14:00:00'),
+  (8, 4, '2022-01-04 14:01:00'),
+  (9, 5, '2022-01-05 16:00:00'),
+  (10, 6, '2022-01-05 16:01:00'),
+  (11, 6, '2022-01-06 09:00:00'),
+  (12, 6, '2022-01-06 09:01:00'),
+  (13, 7, '2022-01-07 11:00:00'),
+  (14, 7, '2022-01-07 11:01:00'),
+  (15, 8, '2022-01-08 12:00:00'),
+  (16, 8, '2022-01-08 12:01:00'),
+  (17, 9, '2022-01-09 10:00:00'),
+  (18, 9, '2022-01-09 10:01:00'),
+  (19, 10, '2022-01-10 08:00:00'),
+  (20, 10, '2022-01-10 08:01:00'),
+  (21, 11, '2022-01-11 14:00:00'),
+  (22, 11, '2022-01-11 14:01:00'),
+  (23, 11, '2022-01-12 16:00:00'),
+  (24, 11, '2022-01-12 16:01:00');
+
   -- Generate random yea/nay votes for each poll and randomly skip half of the votes
 INSERT INTO votes (user_id, poll_id, vote_type)
 SELECT

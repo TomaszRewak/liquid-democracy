@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS comments;
+
+DROP TABLE IF EXISTS whistles;
+
 DROP TABLE IF EXISTS party_affiliations;
 
 DROP TABLE IF EXISTS parties;
