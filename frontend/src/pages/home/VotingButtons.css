@@ -1,3 +1,5 @@
-.voting-button.unselected:not(:hover) {
+.voting-button:not(.selected):not(:hover) {
     opacity: 0.3;
+    background: #00000029 !important;
+    color: black !important;
 }

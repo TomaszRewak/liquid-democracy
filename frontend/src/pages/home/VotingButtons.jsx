@@ -9,9 +9,9 @@ function VotingButton({ newVotewType, color }) {
     const icon = voteType === newVotewType
         ? 'check square'
         : 'square outline';
-    const className = !voteType || voteType === newVotewType
-        ? 'voting-button'
-        : 'voting-button unselected';
+    const className = voteType === newVotewType
+        ? 'voting-button selected'
+        : 'voting-button';
 
     return (
         <Button color={color} className={className} onClick={() => castVote(newVotewType)}>
