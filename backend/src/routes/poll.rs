@@ -10,6 +10,8 @@ pub struct PollResponse {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub comments: i64,
+    pub whistles: i64,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
     #[serde(with = "ts_seconds")]
@@ -24,7 +26,21 @@ pub async fn get(
 
     let poll = connection
         .query_one(
-            "SELECT id, name, description, created_at, updated_at FROM polls WHERE id = $1",
+            "
+                SELECT
+                    polls.id,
+                    polls.name,
+                    polls.description,
+                    COALESCE(COUNT(comments.id), 0) AS comments,
+                    COALESCE(COUNT(whistles.id), 0) AS whistles,
+                    polls.created_at,
+                    polls.updated_at
+                FROM polls
+                LEFT JOIN comments ON comments.poll_id = polls.id
+                LEFT JOIN whistles ON whistles.poll_id = polls.id
+                WHERE polls.id = $1
+                GROUP BY polls.id
+            ",
             &[&id],
         )
         .await
@@ -34,8 +50,10 @@ pub async fn get(
         id: poll.get(0),
         name: poll.get(1),
         description: poll.get(2),
-        created_at: SystemTime::into(poll.get(3)),
-        updated_at: SystemTime::into(poll.get(4)),
+        comments: poll.get(3),
+        whistles: poll.get(4),
+        created_at: SystemTime::into(poll.get(5)),
+        updated_at: SystemTime::into(poll.get(6)),
     };
 
     JsonResponse(poll)

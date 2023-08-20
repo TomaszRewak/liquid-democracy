@@ -49,7 +49,7 @@ function PollCardElement() {
             <Card.Content extra textAlign='center'>
                 <span className='left floated'>
                     <Icon name='comment' />
-                    123
+                    {poll.comments}
                 </span>
                 <span className='floated'>
                     <Icon name='clock' />
@@ -57,7 +57,7 @@ function PollCardElement() {
                 </span>
                 <span className='right floated' style={{color: 'orange'}}>
                     <Icon name='bullhorn' />
-                    123
+                    {poll.whistles}
                 </span>
             </Card.Content>
         </Card>
