@@ -1,6 +1,7 @@
 import { Checkbox, Input, Menu } from "semantic-ui-react";
 import { usePollsFilter, useSetPollsFilter } from "../../contexts/pollsContext";
 import { useCallback } from "react";
+import './SearchBar.css';
 
 export default function SearchBar() {
     const pollsFilter = usePollsFilter();
@@ -19,14 +20,14 @@ export default function SearchBar() {
     }, [pollsFilter, setPollsFilter]);
 
     return (
-        <Menu borderless>
+        <Menu borderless className="search-bar">
             <Menu.Item>
                 <Input value={pollsFilter.textFilter} onChange={textFilterChanged} placeholder={'Search...'} />
             </Menu.Item>
             <Menu.Item position='right'>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Checkbox checked={pollsFilter.includeExpired} label='Include expired' onChange={includeExpiredChanged} toggle className='search-bar-toggle' />
-                    <Checkbox checked={pollsFilter.includeUpcoming} label='Include upcoming' onChange={includeUpcomingChanged} toggle className='search-bar-toggle' />
+                    <Checkbox checked={pollsFilter.includeExpired} label='Include expired' onChange={includeExpiredChanged} toggle />
+                    <Checkbox checked={pollsFilter.includeUpcoming} label='Include upcoming' onChange={includeUpcomingChanged} toggle />
                 </div>
             </Menu.Item>
         </Menu>

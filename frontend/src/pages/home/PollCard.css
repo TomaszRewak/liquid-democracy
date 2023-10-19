@@ -10,6 +10,7 @@
 
 .poll-card .chart-card-content {
     background-color: #f9fafb !important;
+    height: 256px;
 }
 
 .poll-card .statistics-column {

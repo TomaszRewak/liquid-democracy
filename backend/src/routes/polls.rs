@@ -15,6 +15,7 @@ pub struct GetPollsRequest {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GetPollsResponse {
     pub polls: Vec<i32>,
+    pub total_count: i64,
 }
 
 pub async fn get(
@@ -24,22 +25,23 @@ pub async fn get(
     let connection = data_context.get_connection().await;
     let offset = (query.page - 1) * query.page_size;
 
-    let polls = connection
+    let polls_and_count = connection
         .query(
             "
-                SELECT
-                    polls.id
-                FROM polls
-                WHERE
-                    ($1 OR polls.end_time >= NOW())
-                    AND
-                    ($2 OR polls.start_time <= NOW())
-                    AND
-                    ($3 = '' OR polls.name ILIKE '%' || $3 || '%')
-                ORDER BY polls.end_time ASC
-                LIMIT $4
-                OFFSET $5
-        ",
+            SELECT
+                polls.id,
+                COUNT(*) OVER() as total_count
+            FROM polls
+            WHERE
+                ($1 OR polls.end_time >= NOW())
+                AND
+                ($2 OR polls.start_time <= NOW())
+                AND
+                ($3 = '' OR polls.name ILIKE '%' || $3 || '%')
+            ORDER BY polls.end_time ASC
+            LIMIT $4
+            OFFSET $5
+    ",
             &[
                 &query.include_expired,
                 &query.include_upcoming,
@@ -49,12 +51,16 @@ pub async fn get(
             ],
         )
         .await
-        .unwrap()
-        .iter()
-        .map(|row| row.get(0))
-        .collect();
+        .unwrap();
 
-    let response = GetPollsResponse { polls };
+    let polls = polls_and_count.iter().map(|row| row.get(0)).collect();
+
+    let total_count = polls_and_count
+        .get(0)
+        .map(|row| row.get::<usize, i64>(1))
+        .unwrap_or(0);
+
+    let response = GetPollsResponse { polls, total_count };
 
     JsonResponse(response)
 }

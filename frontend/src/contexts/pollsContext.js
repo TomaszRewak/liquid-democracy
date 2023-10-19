@@ -31,11 +31,18 @@ export function PollsProvider({ children }) {
         const parametrizedPollsUrl = `${pollsUrl}?${params.toString()}`;
 
         const response = await fetch(parametrizedPollsUrl, { credentials: 'include' });
-        const polls = response.ok ?
-            (await response.json()).polls
-            : [];
 
-        setPolls(polls);
+        if (!response.ok)
+        {
+            setPolls([]);
+            setPages(1);
+            return;
+        }
+
+        const data = await response.json();
+
+        setPages(Math.ceil(data.total_count / pollsFilter.pageSize));
+        setPolls(data.polls);
     }, [pollsUrl, profile, pollsFilter]);
 
     useEffect(() => {
@@ -43,7 +50,7 @@ export function PollsProvider({ children }) {
     }, [refreshPolls]);
 
     return (
-        <PollsContext.Provider value={{ polls, pollsFilter, setPollsFilter }}>
+        <PollsContext.Provider value={{ polls, pollsFilter, setPollsFilter, pages }}>
             {children}
         </PollsContext.Provider>
     );
@@ -59,4 +66,8 @@ export function usePollsFilter() {
 
 export function useSetPollsFilter() {
     return useContext(PollsContext).setPollsFilter;
+}
+
+export function usePages() {
+    return useContext(PollsContext).pages;
 }
