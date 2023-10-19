@@ -6,12 +6,14 @@ import { useState, useCallback, useMemo } from 'react';
 import { Button, Input, Menu, Icon, Dropdown, Container, Segment } from 'semantic-ui-react';
 import { ProfileProvider, useProfile, useLogin, useLogout, useSetParty } from './contexts/profileContext';
 import { PartiesProvider, useParties } from './contexts/partiesContext';
-import { PollsProvider } from './contexts/pollsContext';
+import { VisibilityProvider, useShowSensitiveData, useToggleShowSensitiveData } from './contexts/visibilityContext';
 
 function LoggedInView({ profile }) {
     const logout = useLogout();
     const setParty = useSetParty();
     const parties = useParties();
+    const showSensitiveData = useShowSensitiveData();
+    const toggleShowSensitiveData = useToggleShowSensitiveData();
 
     const selectParty = useCallback(async (e, { value }) => {
         setParty(value);
@@ -28,7 +30,7 @@ function LoggedInView({ profile }) {
 
     return (
         <div>
-            <Button icon='eye' size='mini' />
+            <Button icon='eye' size='mini' color={showSensitiveData ? undefined : 'red'} onClick={toggleShowSensitiveData} />
             <Dropdown labeled button text={party.name} icon='users' className={`mini icon ${party.color}`} disabled={party.is_member}>
                 <Dropdown.Menu>
                     {
@@ -87,29 +89,31 @@ function AuthView() {
 
 function App() {
     return (
-        <ProfileProvider>
-            <PartiesProvider>
-                <Menu className='top-menu' fixed='top' borderless={true}>
-                    <Menu.Item position='left'>
-                        <div>
-                            <Button icon size='mini' className='mini' labelPosition='left' href='/'>
-                                <Icon name='chart pie' />
-                                liquid democracy
-                            </Button>
-                        </div>
-                    </Menu.Item>
-                    <Menu.Item position='right'>
-                        <AuthView />
-                    </Menu.Item>
-                </Menu>
-                <Container className='main'>
-                    <Routes>
-                        <Route path='/' element={<Home />} />
-                        <Route path='/poll/:pollId' element={<Poll />} />
-                    </Routes>
-                </Container>
-            </PartiesProvider>
-        </ProfileProvider>
+        <VisibilityProvider>
+            <ProfileProvider>
+                <PartiesProvider>
+                    <Menu className='top-menu' fixed='top' borderless={true}>
+                        <Menu.Item position='left'>
+                            <div>
+                                <Button icon size='mini' className='mini' labelPosition='left' href='/'>
+                                    <Icon name='chart pie' />
+                                    liquid democracy
+                                </Button>
+                            </div>
+                        </Menu.Item>
+                        <Menu.Item position='right'>
+                            <AuthView />
+                        </Menu.Item>
+                    </Menu>
+                    <Container className='main'>
+                        <Routes>
+                            <Route path='/' element={<Home />} />
+                            <Route path='/poll/:pollId' element={<Poll />} />
+                        </Routes>
+                    </Container>
+                </PartiesProvider>
+            </ProfileProvider>
+        </VisibilityProvider>
     );
 }
 
