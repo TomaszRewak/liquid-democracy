@@ -103,9 +103,6 @@ function App() {
                     </Menu.Item>
                 </Menu>
                 <Container className='main'>
-                    <Segment>
-                        <Input></Input>
-                    </Segment>
                     <Routes>
                         <Route path='/' element={<Home />} />
                         <Route path='/poll/:pollId' element={<Poll />} />
