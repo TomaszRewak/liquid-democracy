@@ -1,6 +1,8 @@
 import './Chart.css'
 
 function generateArcPath(outerRadius, innerRadius, startPercent, endPercent) {
+    endPercent = Math.min(endPercent, 0.9999);
+
     const startAngle = 2 * Math.PI * startPercent - Math.PI / 2;
     const endAngle = 2 * Math.PI * endPercent - Math.PI / 2;
     const arcSweep = endAngle - startAngle < Math.PI ? "0" : "1";

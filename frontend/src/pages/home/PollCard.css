@@ -1,3 +1,13 @@
+.poll-card .poll-id {
+    padding-right: 10px;
+    opacity: 0.2;
+}
+
+.poll-card .poll-link-icon {
+    padding-left: 10px;
+    opacity: 0.2;
+}
+
 .poll-card .chart-card-content {
     background-color: #f9fafb !important;
 }

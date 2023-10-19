@@ -21,7 +21,8 @@ function PollCardElement() {
             <Card.Content>
                 <Card.Header>
                     <Link to={`/poll/${poll.id}`}>
-                        <Icon name='external alternate' className='right floated' style={{ opacity: 0.2 }} />
+                        <span className='poll-id'>#{poll.id}</span>
+                        <Icon className='poll-link-icon right floated' name='external alternate' />
                         {poll.name}
                     </Link>
                 </Card.Header>

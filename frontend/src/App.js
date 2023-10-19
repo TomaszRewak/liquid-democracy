@@ -24,12 +24,12 @@ function LoggedInView({ profile }) {
         label: { color: party.color, empty: true, circular: true }
     })), [parties]);
 
-    const party = profile['party_affiliation'] || { name: 'Unaffiliated', color: '' };
+    const party = profile['party_affiliation'] || { name: 'Unaffiliated', color: '', is_member: false };
 
     return (
         <div>
             <Button icon='eye' size='mini' />
-            <Dropdown labeled button text={party.name} icon='users' className={`mini icon ${party.color}`}>
+            <Dropdown labeled button text={party.name} icon='users' className={`mini icon ${party.color}`} disabled={party.is_member}>
                 <Dropdown.Menu>
                     {
                         partyOptions.map(party => (
