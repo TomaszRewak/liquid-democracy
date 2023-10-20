@@ -2,11 +2,12 @@ import { Link, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Home from './pages/home/Home';
 import Poll from './pages/poll/Poll';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, Fragment } from 'react';
 import { Button, Input, Menu, Icon, Dropdown, Container, Segment } from 'semantic-ui-react';
 import { ProfileProvider, useProfile, useLogin, useLogout, useSetParty } from './contexts/profileContext';
 import { PartiesProvider, useParties } from './contexts/partiesContext';
 import { VisibilityProvider, useShowSensitiveData, useToggleShowSensitiveData } from './contexts/visibilityContext';
+import Landing from './pages/landing/Landing';
 
 function LoggedInView({ profile }) {
     const logout = useLogout();
@@ -79,12 +80,49 @@ function LogInView() {
     )
 }
 
-function AuthView() {
+function TopBar({ children }) {
+    return (
+        <Menu className='top-menu' fixed='top' borderless={true}>
+            <Menu.Item position='left'>
+                <Link to='/'>
+                    <Button icon size='mini' className='mini' labelPosition='left'>
+                        <Icon name='chart pie' />
+                        liquid democracy
+                    </Button>
+                </Link>
+            </Menu.Item>
+            <Menu.Item position='right'>
+                {children}
+            </Menu.Item>
+        </Menu>
+    );
+}
+
+function AppContent() {
     const profile = useProfile();
 
-    return profile
-        ? <LoggedInView profile={profile} />
-        : <LogInView />;
+    if (!profile) {
+        return (
+            <TopBar>
+                <LogInView />
+                <Landing />
+            </TopBar>
+        );
+    }
+
+    return (
+        <Fragment>
+            <TopBar>
+                <LoggedInView profile={profile} />
+            </TopBar>
+            <Container className='main'>
+                <Routes>
+                    <Route path='/' element={<Home />} />
+                    <Route path='/poll/:pollId' element={<Poll />} />
+                </Routes>
+            </Container>
+        </Fragment>
+    );
 }
 
 function App() {
@@ -92,25 +130,7 @@ function App() {
         <VisibilityProvider>
             <ProfileProvider>
                 <PartiesProvider>
-                    <Menu className='top-menu' fixed='top' borderless={true}>
-                        <Menu.Item position='left'>
-                            <Link to='/'>
-                                <Button icon size='mini' className='mini' labelPosition='left'>
-                                    <Icon name='chart pie' />
-                                    liquid democracy
-                                </Button>
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item position='right'>
-                            <AuthView />
-                        </Menu.Item>
-                    </Menu>
-                    <Container className='main'>
-                        <Routes>
-                            <Route path='/' element={<Home />} />
-                            <Route path='/poll/:pollId' element={<Poll />} />
-                        </Routes>
-                    </Container>
+                    <AppContent />
                 </PartiesProvider>
             </ProfileProvider>
         </VisibilityProvider>
