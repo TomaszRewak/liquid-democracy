@@ -1,5 +1,9 @@
 # liquid-democracy
 
+<p align="center">
+  <img src="https://github.com/TomaszRewak/liquid-democracy/blob/master/examples/screenshot.png?raw=true" width=800/>
+</p>
+
 # Step by step setup
 
 ### Start the postgresql
