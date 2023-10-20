@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Home from './pages/home/Home';
 import Poll from './pages/poll/Poll';
@@ -94,12 +94,12 @@ function App() {
                 <PartiesProvider>
                     <Menu className='top-menu' fixed='top' borderless={true}>
                         <Menu.Item position='left'>
-                            <div>
-                                <Button icon size='mini' className='mini' labelPosition='left' href='/'>
+                            <Link to='/'>
+                                <Button icon size='mini' className='mini' labelPosition='left'>
                                     <Icon name='chart pie' />
                                     liquid democracy
                                 </Button>
-                            </div>
+                            </Link>
                         </Menu.Item>
                         <Menu.Item position='right'>
                             <AuthView />

@@ -6,6 +6,7 @@ import { VotingProvider } from "../../contexts/votingContext";
 import { VotingButtons } from "./VotingButtons";
 import './PollCard.css';
 import { StatisticsLabel } from './StatisticsLabel';
+import Timer from '../../components/Timer';
 
 function PollCardElement() {
     const poll = usePollDetails();
@@ -53,8 +54,7 @@ function PollCardElement() {
                     {poll.comments}
                 </span>
                 <span className='floated'>
-                    <Icon name='clock' />
-                    ends <span style={{opacity: 0.3}}>in</span> 1w 2d 03h
+                    <Timer startTime={poll.start_time} endTime={poll.end_time} />
                 </span>
                 <span className='right floated' style={{color: 'orange'}}>
                     <Icon name='bullhorn' />

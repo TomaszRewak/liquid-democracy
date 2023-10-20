@@ -11,6 +11,8 @@ pub struct PollResponse {
     pub name: String,
     pub description: String,
     pub comments: i64,
+    pub start_time: DateTime<Utc>,
+    pub end_time: DateTime<Utc>,
     pub whistles: i64,
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
@@ -31,6 +33,8 @@ pub async fn get(
                     polls.id,
                     polls.name,
                     polls.description,
+                    polls.start_time,
+                    polls.end_time,
                     COALESCE(COUNT(comments.id), 0) AS comments,
                     COALESCE(COUNT(whistles.id), 0) AS whistles,
                     polls.created_at,
@@ -50,10 +54,12 @@ pub async fn get(
         id: poll.get(0),
         name: poll.get(1),
         description: poll.get(2),
-        comments: poll.get(3),
-        whistles: poll.get(4),
-        created_at: SystemTime::into(poll.get(5)),
-        updated_at: SystemTime::into(poll.get(6)),
+        start_time: SystemTime::into(poll.get(3)),
+        end_time: SystemTime::into(poll.get(4)),
+        comments: poll.get(5),
+        whistles: poll.get(6),
+        created_at: SystemTime::into(poll.get(7)),
+        updated_at: SystemTime::into(poll.get(8)),
     };
 
     JsonResponse(poll)

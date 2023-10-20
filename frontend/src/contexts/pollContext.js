@@ -21,7 +21,13 @@ export const PollProvider = ({ pollId, children }) => {
     const fetchPollDetails = useCallback(async () => {
         const response = await fetch(pollDetailsUrl, { credentials: 'include' });
         const data = await response.json();
-        setPollDetails(data);
+        setPollDetails(
+            {
+                ...data,
+                start_time: new Date(data.start_time),
+                end_time: new Date(data.end_time)
+            }
+        );
     }, [pollDetailsUrl]);
 
     const fetchPollResults = useCallback(async () => {
