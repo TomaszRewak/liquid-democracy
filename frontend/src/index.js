@@ -1,16 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom';
+import App from './app/App';
+import reportWebVitals from './utils/reportWebVitals';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css'
+import Home from './pages/home/Home';
+import Poll from './pages/poll/Poll';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <App>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/poll/:pollId' element={<Poll />} />
+        </Routes>
+      </App>
     </BrowserRouter>
   </React.StrictMode>
 );
