@@ -36,8 +36,9 @@ pub async fn get(
         .query(
             "
                 WITH
-                end_time AS (
+                time_frame AS (
                     SELECT
+                        polls.start_time AS start_time,
                         polls.end_time AS end_time
                     FROM
                         polls
@@ -52,7 +53,7 @@ pub async fn get(
                     FROM
                         party_affiliations
                     INNER JOIN
-                        end_time ON end_time.end_time >= party_affiliations.created_at
+                        time_frame ON time_frame.end_time >= party_affiliations.created_at
                     ORDER BY
                         party_affiliations.user_id,
                         party_affiliations.created_at DESC
@@ -65,6 +66,8 @@ pub async fn get(
                         current_party_affiliations.is_member AS is_member
                     FROM
                         votes
+                    INNER JOIN
+                        time_frame ON time_frame.start_time <= votes.created_at AND time_frame.end_time >= votes.created_at
                     LEFT JOIN
                         current_party_affiliations ON current_party_affiliations.user_id = votes.user_id
                     WHERE

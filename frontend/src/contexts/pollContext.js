@@ -48,6 +48,11 @@ export const PollProvider = ({ pollId, children }) => {
         fetchPollResults();
     }, [fetchPollResults]);
 
+    useEffect(() => {
+        const interval = setInterval(() => fetchPollResults(), 5_000);
+        return () => clearInterval(interval);
+    }, [fetchPollResults]);
+
     return (
         <PollContext.Provider value={{ pollDetails, pollResults, fetchPollResults }}>
             {children}

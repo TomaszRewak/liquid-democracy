@@ -85,37 +85,37 @@ VALUES
   ('Great Party', 'purple');
 
 INSERT INTO
-  party_affiliations (user_id, party_id, is_member)
+  party_affiliations (user_id, party_id, is_member, created_at)
 VALUES
-  (1, 3, TRUE),
-  (2, 2, TRUE),
-  (3, 1, TRUE),
-  (4, 1, TRUE),
-  (5, 2, TRUE),
-  (6, 2, TRUE),
-  (7, 3, TRUE),
-  (8, 1, TRUE),
-  (9, 1, TRUE),
-  (10, 2, TRUE),
-  (11, 1, FALSE),
-  (12, 2, FALSE),
-  (13, 3, FALSE),
-  (14, 1, FALSE),
-  (15, 2, FALSE),
-  (16, 1, FALSE),
-  (17, 2, FALSE),
-  (18, 3, FALSE),
-  (19, 1, FALSE),
-  (31, 1, FALSE),
-  (32, 2, FALSE),
-  (33, 3, FALSE),
-  (34, 1, FALSE),
-  (35, 2, FALSE),
-  (36, 1, FALSE),
-  (37, 2, FALSE),
-  (38, 3, FALSE),
-  (39, 2, FALSE),
-  (40, 2, FALSE);
+  (1, 3, TRUE, NOW() - INTERVAL '3 months'),
+  (2, 2, TRUE, NOW() - INTERVAL '3 months'),
+  (3, 1, TRUE, NOW() - INTERVAL '3 months'),
+  (4, 1, TRUE, NOW() - INTERVAL '3 months'),
+  (5, 2, TRUE, NOW() - INTERVAL '3 months'),
+  (6, 2, TRUE, NOW() - INTERVAL '3 months'),
+  (7, 3, TRUE, NOW() - INTERVAL '3 months'),
+  (8, 1, TRUE, NOW() - INTERVAL '3 months'),
+  (9, 1, TRUE, NOW() - INTERVAL '3 months'),
+  (10, 2, TRUE, NOW() - INTERVAL '3 months'),
+  (11, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (12, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (13, 3, FALSE, NOW() - INTERVAL '3 months'),
+  (14, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (15, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (16, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (17, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (18, 3, FALSE, NOW() - INTERVAL '3 months'),
+  (19, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (31, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (32, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (33, 3, FALSE, NOW() - INTERVAL '3 months'),
+  (34, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (35, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (36, 1, FALSE, NOW() - INTERVAL '3 months'),
+  (37, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (38, 3, FALSE, NOW() - INTERVAL '3 months'),
+  (39, 2, FALSE, NOW() - INTERVAL '3 months'),
+  (40, 2, FALSE, NOW() - INTERVAL '3 months');
 
 INSERT INTO
   comments (user_id, poll_id, comment, created_at)
@@ -170,7 +170,7 @@ VALUES
   (24, 11, '2022-01-12 16:01:00');
 
   -- Generate random yea/nay votes for each poll and randomly skip half of the votes
-INSERT INTO votes (user_id, poll_id, vote_type)
+INSERT INTO votes (user_id, poll_id, vote_type, created_at)
 SELECT
   user_id,
   poll_id,
@@ -180,7 +180,8 @@ SELECT
     WHEN 2 THEN 'nay'::vote_type
     WHEN 3 THEN 'nay'::vote_type
     ELSE 'abstain'::vote_type
-  END AS vote_type
+  END AS vote_type,
+  LEAST(polls.start_time + (random() * (polls.end_time - polls.start_time)), NOW()) AS created_at
 FROM (
   SELECT user_id, poll_id
   FROM (
@@ -188,4 +189,5 @@ FROM (
     FROM generate_series(1, 50) AS user_id, generate_series(1, 15) AS poll_id
   ) AS user_poll_combinations
 ) AS numbered_user_poll_combinations
+JOIN polls ON polls.id = numbered_user_poll_combinations.poll_id
 WHERE floor(random() * 2) = 0;
