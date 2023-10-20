@@ -16,7 +16,7 @@
 .poll-card .statistics-column {
     display: flex !important;
     flex-direction: column !important;
-    align-items: end !important;
+    align-items: flex-end !important;
     right: -45px !important;
     gap: 10px !important;
 }

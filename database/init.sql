@@ -20,6 +20,8 @@ CREATE TABLE sessions (
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX ix_session_token ON sessions (token) WHERE is_valid;
+
 CREATE TABLE polls (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -37,6 +39,8 @@ CREATE TABLE votes (
   vote_type vote_type NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX ix_votes_user_id_poll_id_created_at ON votes (user_id, poll_id, created_at);
 
 CREATE TABLE parties (
   id SERIAL PRIMARY KEY,

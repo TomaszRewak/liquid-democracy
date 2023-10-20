@@ -3,13 +3,14 @@ import './App.css';
 import Home from './pages/home/Home';
 import Poll from './pages/poll/Poll';
 import { useState, useCallback, useMemo, Fragment } from 'react';
-import { Button, Input, Menu, Icon, Dropdown, Container, Segment } from 'semantic-ui-react';
+import { Button, Input, Menu, Icon, Dropdown, Container } from 'semantic-ui-react';
 import { ProfileProvider, useProfile, useLogin, useLogout, useSetParty } from './contexts/profileContext';
 import { PartiesProvider, useParties } from './contexts/partiesContext';
 import { VisibilityProvider, useShowSensitiveData, useToggleShowSensitiveData } from './contexts/visibilityContext';
 import Landing from './pages/landing/Landing';
 
-function LoggedInView({ profile }) {
+function LoggedInView() {
+    const profile = useProfile();
     const logout = useLogout();
     const setParty = useSetParty();
     const parties = useParties();
